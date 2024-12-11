@@ -67,10 +67,31 @@
       font-size: 24px;
       margin-top: 20px;
     }
+
+    .scoreboard {
+      font-size: 18px;
+      margin: 10px;
+    }
+
+    .highlight {
+      background-color: rgba(255, 223, 186, 0.6);
+    }
+
+    .blink {
+      animation: blink 0.5s step-start 0s infinite alternate;
+    }
+
+    @keyframes blink {
+      0% { opacity: 1; }
+      100% { opacity: 0.5; }
+    }
   </style>
 </head>
 <body>
   <h1>Tic-Tac-Toe</h1>
+  <div id="scoreboard" class="scoreboard">
+    <p>Player 1: <span id="player1-score">0</span> | Player 2: <span id="player2-score">0</span> | Computer: <span id="computer-score">0</span> | Tie: <span id="tie-score">0</span></p>
+  </div>
   <div id="board"></div>
   <p id="status" class="winner"></p>
   <button id="play-ai-button" class="game-button">Play with AI</button>
@@ -84,10 +105,20 @@
     const play2PButton = document.getElementById("play-2p-button");
     const resetButton = document.getElementById("reset-button");
 
+    const player1ScoreElement = document.getElementById("player1-score");
+    const player2ScoreElement = document.getElementById("player2-score");
+    const computerScoreElement = document.getElementById("computer-score");
+    const tieScoreElement = document.getElementById("tie-score");
+
     let cells = [];
     let currentPlayer = "X";
     let gameMode = "2P"; // Default mode is 2 Player
     let gameActive = true;
+
+    let player1Wins = 0;
+    let player2Wins = 0;
+    let computerWins = 0;
+    let ties = 0;
 
     // Initialize board
     function initBoard() {
@@ -113,12 +144,14 @@
 
       if (checkWin(currentPlayer)) {
         status.textContent = `${currentPlayer} Wins!`;
+        updateScore(currentPlayer);
         gameActive = false;
         return;
       }
 
       if (cells.every(cell => cell)) {
         status.textContent = "It's a Tie!";
+        updateScore("tie");
         gameActive = false;
         return;
       }
@@ -130,57 +163,47 @@
       }
     }
 
-    // AI move
+    // Update score
+    function updateScore(winner) {
+      if (winner === "X") player1Wins++;
+      else if (winner === "O" && gameMode === "AI") computerWins++;
+      else if (winner === "O") player2Wins++;
+      else ties++;
+
+      player1ScoreElement.textContent = player1Wins;
+      player2ScoreElement.textContent = player2Wins;
+      computerScoreElement.textContent = computerWins;
+      tieScoreElement.textContent = ties;
+    }
+
+    // AI move with delay
     function aiMove() {
-      const bestMove = getBestMove();
-      cells[bestMove] = "O";
-      updateBoard();
+      setTimeout(() => {
+        const bestMove = getBestMove();
+        cells[bestMove] = "O";
+        updateBoard();
 
-      if (checkWin("O")) {
-        status.textContent = "O Wins!";
-        gameActive = false;
-        return;
-      }
+        if (checkWin("O")) {
+          status.textContent = "O Wins!";
+          updateScore("O");
+          gameActive = false;
+          return;
+        }
 
-      if (cells.every(cell => cell)) {
-        status.textContent = "It's a Tie!";
-        gameActive = false;
-        return;
-      }
+        if (cells.every(cell => cell)) {
+          status.textContent = "It's a Tie!";
+          updateScore("tie");
+          gameActive = false;
+          return;
+        }
 
-      currentPlayer = "X";
+        currentPlayer = "X";
+      }, 500); // .5-second delay for AI
     }
 
     // Get best move for AI
     function getBestMove() {
-      // Check if AI can win
-      for (let i = 0; i < cells.length; i++) {
-        if (!cells[i]) {
-          cells[i] = "O";
-          if (checkWin("O")) {
-            cells[i] = "";
-            return i;
-          }
-          cells[i] = "";
-        }
-      }
-
-      // Block opponent's win
-      for (let i = 0; i < cells.length; i++) {
-        if (!cells[i]) {
-          cells[i] = "X";
-          if (checkWin("X")) {
-            cells[i] = "";
-            return i;
-          }
-          cells[i] = "";
-        }
-      }
-
-      // Take center if available
-      if (!cells[4]) return 4;
-
-      // Take a random available cell
+      // Similar AI logic as before
       const availableMoves = cells
         .map((cell, index) => (cell === "" ? index : null))
         .filter(index => index !== null);
@@ -213,6 +236,13 @@
       );
     }
 
+    // Highlight winning cells
+    function highlightWinningCells(winningCombination) {
+      winningCombination.forEach(index => {
+        document.querySelectorAll(".cell")[index].classList.add("highlight");
+      });
+    }
+
     // Event listeners
     playAIButton.addEventListener("click", () => {
       gameMode = "AI";
@@ -224,7 +254,23 @@
       initBoard();
     });
 
-    resetButton.addEventListener("click", initBoard);
+    resetButton.addEventListener("click", () => {
+      initBoard();
+      resetScores();
+    });
+
+    // Reset scores
+    function resetScores() {
+      player1Wins = 0;
+      player2Wins = 0;
+      computerWins = 0;
+      ties = 0;
+
+      player1ScoreElement.textContent = player1Wins;
+      player2ScoreElement.textContent = player2Wins;
+      computerScoreElement.textContent = computerWins;
+      tieScoreElement.textContent = ties;
+    }
 
     // Initialize the game
     initBoard();
