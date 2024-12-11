@@ -18,18 +18,19 @@
     border: 1px solid #ccc;
     font-size: 2em;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.highlight {
+.cell.highlight {
     background-color: lightgreen;
 }
 
-.blink {
+.cell.blink {
     animation: blink-animation 1s infinite;
 }
 
 @keyframes blink-animation {
-    50% { background-color: rgba(255, 0, 0, 0.3); }
+    50% { background-color: red; }
 }
 
 .status {
@@ -55,17 +56,13 @@
     cursor: pointer;
     border: none;
     border-radius: 5px;
-    margin: 5px;
+    margin: 10px;
 }
 
 .btn:disabled {
     background-color: lightgray;
 }
 
-#resetBtn {
-    display: inline-block;
-}
-
-#replayBtn {
-    display: none;
+.grid {
+    margin-bottom: 20px;
 }
