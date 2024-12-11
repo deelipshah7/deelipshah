@@ -4,70 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tic-Tac-Toe Game</title>
-    <style>
-        /* Style for the Tic-Tac-Toe grid */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(3, 100px);
-            grid-template-rows: repeat(3, 100px);
-            gap: 5px;
-            margin: 20px auto;
-            max-width: 320px;
-        }
-
-        .cell {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100px;
-            height: 100px;
-            background-color: #f0f0f0;
-            border: 1px solid #ccc;
-            font-size: 2em;
-            cursor: pointer;
-        }
-
-        .highlight {
-            background-color: lightgreen;
-        }
-
-        .blink {
-            animation: blink-animation 1s infinite;
-        }
-
-        @keyframes blink-animation {
-            50% { background-color: red; }
-        }
-
-        .status {
-            text-align: center;
-            font-size: 1.2em;
-        }
-
-        .scoreboard {
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .scoreboard span {
-            font-size: 1.5em;
-        }
-
-        .btn {
-            background-color: skyblue;
-            padding: 10px 20px;
-            font-size: 1.2em;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-        }
-
-        .btn:disabled {
-            background-color: lightgray;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css"> <!-- Link to CSS -->
 </head>
 <body>
     <div class="status" id="status">Player X's turn</div>
@@ -78,6 +15,7 @@
     <div class="scoreboard">
         <div id="player1Score">Player 1: 0</div>
         <div id="player2Score">Player 2: 0</div>
+        <div id="computerScore">Computer: 0</div>
         <div id="tieScore">Tie: 0</div>
     </div>
 
@@ -87,7 +25,7 @@
         <button class="btn" id="resetBtn">Restart Game</button>
         <button class="btn" id="replayBtn" style="display:none;">Play Again</button>
     </div>
-    
-    <script src="game.js"></script>
+
+    <script src="script.js"></script> <!-- Link to JavaScript -->
 </body>
 </html>
