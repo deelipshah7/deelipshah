@@ -119,6 +119,7 @@
     let gameActive = true;
     let aiTurnDelay = 1000; // 1 second delay for AI thinking
     let aiWinProbability = 0.95; // AI should be hard most of the time but be winnable sometimes
+    let aiRoundCount = 0; // Track AI rounds to make it easier occasionally
 
     // Initialize board
     function initBoard() {
@@ -167,34 +168,38 @@
 
     // AI move
     function aiMove() {
-      const bestMove = getBestMove();
-      cells[bestMove] = "O";
-      updateBoard();
+      aiRoundCount++;
 
-      if (checkWin("O")) {
-        updateScore("Computer");
-        status.textContent = "O Wins!";
-        highlightWinningCombination("O");
-        gameActive = false;
-        return;
-      }
+      setTimeout(() => {
+        const bestMove = getBestMove();
+        cells[bestMove] = "O";
+        updateBoard();
 
-      if (cells.every(cell => cell)) {
-        updateScore("Tie");
-        status.textContent = "It's a Tie!";
-        blinkTieEffect();
-        gameActive = false;
-        return;
-      }
+        if (checkWin("O")) {
+          updateScore("Computer");
+          status.textContent = "O Wins!";
+          highlightWinningCombination("O");
+          gameActive = false;
+          return;
+        }
 
-      currentPlayer = "X";
+        if (cells.every(cell => cell)) {
+          updateScore("Tie");
+          status.textContent = "It's a Tie!";
+          blinkTieEffect();
+          gameActive = false;
+          return;
+        }
+
+        currentPlayer = "X";
+      }, aiTurnDelay); // AI thinking time
     }
 
     // Get best move for AI
     function getBestMove() {
       // Introduce a slight randomness for the AI difficulty adjustment
-      if (Math.random() > aiWinProbability) {
-        return getRandomMove();
+      if (aiRoundCount % 3 === 0) {
+        return getRandomMove(); // Let the player win occasionally
       }
 
       // AI hard: check if AI can win or block player
