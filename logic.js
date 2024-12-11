@@ -5,8 +5,8 @@ let moves = 0;
 let gameMode = null;
 let player1Score = 0;
 let player2Score = 0;
+let computerScore = 0;
 let tieScore = 0;
-let aiDifficulty = 'hard'; // Can be 'easy', 'medium', or 'hard'
 
 const grid = document.getElementById("grid");
 const status = document.getElementById("status");
@@ -16,6 +16,7 @@ const playWithAiButton = document.getElementById("playWithAiBtn");
 const playWithPlayerButton = document.getElementById("playWithPlayerBtn");
 const player1ScoreElement = document.getElementById("player1Score");
 const player2ScoreElement = document.getElementById("player2Score");
+const computerScoreElement = document.getElementById("computerScore");
 const tieScoreElement = document.getElementById("tieScore");
 
 // Initialize the game
@@ -48,7 +49,7 @@ function handleCellClick(e) {
 
     checkWinner();
     if (gameMode === "AI" && currentPlayer === "X") {
-        setTimeout(aiMove, 500); // AI thinking time of 0.5s
+        setTimeout(aiMove, 500); // AI thinking time
     } else {
         switchPlayer();
     }
@@ -100,6 +101,9 @@ function updateScore(winner) {
     } else if (winner === "O") {
         player2Score++;
         player2ScoreElement.textContent = `Player 2: ${player2Score}`;
+    } else if (winner === "Computer") {
+        computerScore++;
+        computerScoreElement.textContent = `Computer: ${computerScore}`;
     }
 }
 
@@ -159,6 +163,7 @@ playWithPlayerButton.addEventListener("click", () => {
 });
 
 resetButton.addEventListener("click", initBoard);
+
 replayButton.addEventListener("click", initBoard);
 
 // Initialize the game
