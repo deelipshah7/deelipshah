@@ -67,12 +67,37 @@
       font-size: 24px;
       margin-top: 20px;
     }
+
+    #scoreboard {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    .highlight {
+      background-color: #c3e5d1; /* Creamy green for winning combination */
+    }
+
+    .blink {
+      animation: blink 1s ease-out 3;
+    }
+
+    @keyframes blink {
+      0% { background-color: transparent; }
+      50% { background-color: rgba(255, 0, 0, 0.2); }
+      100% { background-color: transparent; }
+    }
   </style>
 </head>
 <body>
   <h1>Tic-Tac-Toe</h1>
   <div id="board"></div>
   <p id="status" class="winner"></p>
+  <div id="scoreboard">
+    <p>Player 1 Score: <span id="player1-score">0</span></p>
+    <p>Player 2 Score: <span id="player2-score">0</span></p>
+    <p>Computer Score: <span id="computer-score">0</span></p>
+    <p>Tie Score: <span id="tie-score">0</span></p>
+  </div>
   <button id="play-ai-button" class="game-button">Play with AI</button>
   <button id="play-2p-button" class="game-button">2 Player</button>
   <button id="reset-button" class="game-button">Restart Game</button>
@@ -83,11 +108,17 @@
     const playAIButton = document.getElementById("play-ai-button");
     const play2PButton = document.getElementById("play-2p-button");
     const resetButton = document.getElementById("reset-button");
+    const player1Score = document.getElementById("player1-score");
+    const player2Score = document.getElementById("player2-score");
+    const computerScore = document.getElementById("computer-score");
+    const tieScore = document.getElementById("tie-score");
 
     let cells = [];
     let currentPlayer = "X";
     let gameMode = "2P"; // Default mode is 2 Player
     let gameActive = true;
+    let aiTurnDelay = 1000; // 1 second delay for AI thinking
+    let aiWinProbability = 0.95; // AI should be hard most of the time but be winnable sometimes
 
     // Initialize board
     function initBoard() {
@@ -112,13 +143,17 @@
       updateBoard();
 
       if (checkWin(currentPlayer)) {
+        updateScore(currentPlayer);
         status.textContent = `${currentPlayer} Wins!`;
+        highlightWinningCombination(currentPlayer);
         gameActive = false;
         return;
       }
 
       if (cells.every(cell => cell)) {
+        updateScore("Tie");
         status.textContent = "It's a Tie!";
+        blinkTieEffect();
         gameActive = false;
         return;
       }
@@ -126,7 +161,7 @@
       currentPlayer = currentPlayer === "X" ? "O" : "X";
 
       if (gameMode === "AI" && currentPlayer === "O") {
-        aiMove();
+        setTimeout(aiMove, aiTurnDelay);
       }
     }
 
@@ -137,13 +172,17 @@
       updateBoard();
 
       if (checkWin("O")) {
+        updateScore("Computer");
         status.textContent = "O Wins!";
+        highlightWinningCombination("O");
         gameActive = false;
         return;
       }
 
       if (cells.every(cell => cell)) {
+        updateScore("Tie");
         status.textContent = "It's a Tie!";
+        blinkTieEffect();
         gameActive = false;
         return;
       }
@@ -153,7 +192,12 @@
 
     // Get best move for AI
     function getBestMove() {
-      // Check if AI can win
+      // Introduce a slight randomness for the AI difficulty adjustment
+      if (Math.random() > aiWinProbability) {
+        return getRandomMove();
+      }
+
+      // AI hard: check if AI can win or block player
       for (let i = 0; i < cells.length; i++) {
         if (!cells[i]) {
           cells[i] = "O";
@@ -165,7 +209,7 @@
         }
       }
 
-      // Block opponent's win
+      // Block player from winning
       for (let i = 0; i < cells.length; i++) {
         if (!cells[i]) {
           cells[i] = "X";
@@ -181,18 +225,34 @@
       if (!cells[4]) return 4;
 
       // Take a random available cell
+      return getRandomMove();
+    }
+
+    // Get a random available move for AI
+    function getRandomMove() {
       const availableMoves = cells
         .map((cell, index) => (cell === "" ? index : null))
         .filter(index => index !== null);
       return availableMoves[Math.floor(Math.random() * availableMoves.length)];
     }
 
-    // Update board UI
+    // Update the board UI
     function updateBoard() {
       board.querySelectorAll(".cell").forEach((cell, index) => {
         cell.textContent = cells[index];
         if (cells[index]) cell.classList.add("taken");
       });
+    }
+
+    // Update score based on who won
+    function updateScore(winner) {
+      if (winner === "X") {
+        player1Score.textContent = parseInt(player1Score.textContent) + 1;
+      } else if (winner === "O") {
+        computerScore.textContent = parseInt(computerScore.textContent) + 1;
+      } else if (winner === "Tie") {
+        tieScore.textContent = parseInt(tieScore.textContent) + 1;
+      }
     }
 
     // Check win condition
@@ -208,23 +268,51 @@
         [2, 4, 6]
       ];
 
-      return winConditions.some(condition =>
-        condition.every(index => cells[index] === player)
-      );
+      for (let condition of winConditions) {
+        const [a, b, c] = condition;
+        if (cells[a] === player && cells[b] === player && cells[c] === player) {
+          highlightWinningLine(a, b, c);
+          return true;
+        }
+      }
+
+      return false;
     }
 
-    // Event listeners
+    // Highlight the winning combination
+    function highlightWinningLine(a, b, c) {
+      document.querySelectorAll(".cell").forEach((cell, index) => {
+        if ([a, b, c].includes(index)) {
+          cell.classList.add("highlight");
+        }
+      });
+    }
+
+    // Blink the board in red for Tie
+    function blinkTieEffect() {
+      board.classList.add("blink");
+      setTimeout(() => {
+        board.classList.remove("blink");
+      }, 3000);
+    }
+
+    // Play AI Mode
     playAIButton.addEventListener("click", () => {
       gameMode = "AI";
       initBoard();
     });
 
+    // Play 2 Player Mode
     play2PButton.addEventListener("click", () => {
       gameMode = "2P";
       initBoard();
     });
 
-    resetButton.addEventListener("click", initBoard);
+    // Reset the game
+    resetButton.addEventListener("click", () => {
+      initBoard();
+      status.textContent = "";
+    });
 
     // Initialize the game
     initBoard();
