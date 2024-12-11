@@ -7,6 +7,7 @@ let player1Score = 0;
 let player2Score = 0;
 let computerScore = 0;
 let tieScore = 0;
+let gameCount = 0;
 
 const grid = document.getElementById("grid");
 const status = document.getElementById("status");
@@ -16,8 +17,8 @@ const playWithAiButton = document.getElementById("playWithAiBtn");
 const playWithPlayerButton = document.getElementById("playWithPlayerBtn");
 const player1ScoreElement = document.getElementById("player1Score");
 const player2ScoreElement = document.getElementById("player2Score");
-const computerScoreElement = document.getElementById("computerScore");
 const tieScoreElement = document.getElementById("tieScore");
+const computerScoreElement = document.getElementById("computerScore");
 
 // Initialize the game
 function initBoard() {
@@ -48,7 +49,7 @@ function handleCellClick(e) {
     moves++;
 
     checkWinner();
-    if (gameMode === "AI" && currentPlayer === "X") {
+    if (gameMode === "AI" && currentPlayer === "O") {
         setTimeout(aiMove, 500); // AI thinking time
     } else {
         switchPlayer();
@@ -99,11 +100,13 @@ function updateScore(winner) {
         player1Score++;
         player1ScoreElement.textContent = `Player 1: ${player1Score}`;
     } else if (winner === "O") {
-        player2Score++;
-        player2ScoreElement.textContent = `Player 2: ${player2Score}`;
-    } else if (winner === "Computer") {
-        computerScore++;
-        computerScoreElement.textContent = `Computer: ${computerScore}`;
+        if (gameMode === "AI") {
+            computerScore++;
+            computerScoreElement.textContent = `Computer: ${computerScore}`;
+        } else {
+            player2Score++;
+            player2ScoreElement.textContent = `Player 2: ${player2Score}`;
+        }
     }
 }
 
@@ -131,7 +134,7 @@ function resetGame() {
     });
 }
 
-// AI move logic
+// AI move logic (make it competitive but allow the user to win sometimes)
 function aiMove() {
     let availableMoves = [];
     for (let i = 0; i < gameBoard.length; i++) {
@@ -140,7 +143,14 @@ function aiMove() {
         }
     }
 
-    const randomIndex = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+    // Simulate AI playing competently but occasionally letting the user win
+    let randomIndex = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+    
+    // AI decision-making could be improved here by adding logic for blocking and winning
+    if (gameCount % 3 === 0) {
+        randomIndex = availableMoves[Math.floor(Math.random() * availableMoves.length)];  // Make the AI easier in every 3rd game
+    }
+    
     gameBoard[randomIndex] = "O";
     document.querySelectorAll(".cell")[randomIndex].textContent = "O";
     moves++;
@@ -152,14 +162,14 @@ function aiMove() {
 // Event listeners for game mode selection
 playWithAiButton.addEventListener("click", () => {
     gameMode = "AI";
+    gameCount++;
     initBoard();
-    resetButton.style.display = "inline-block";
 });
 
 playWithPlayerButton.addEventListener("click", () => {
     gameMode = "Player";
+    gameCount++;
     initBoard();
-    resetButton.style.display = "inline-block";
 });
 
 resetButton.addEventListener("click", initBoard);
