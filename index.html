@@ -3,59 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ball Dodging Game</title>
+  <title>Enhanced Tic-Tac-Toe</title>
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
       background-color: #222;
       color: white;
-      overflow: hidden;
     }
 
-    #gameArea {
-      position: relative;
+    #gameContainer {
+      text-align: center;
+    }
+
+    #gameBoard {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(80px, 1fr));
+      gap: 5px;
+      width: 90%;
+      max-width: 300px;
+    }
+
+    .cell {
       width: 100%;
-      height: 100vh;
-      background-color: #333;
-      overflow: hidden;
-    }
-
-    #player {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 30px;
-      height: 30px;
-      background-color: red;
-      border-radius: 50%;
-    }
-
-    .block {
-      position: absolute;
-      top: -50px;
-      width: 40px;
-      height: 40px;
-      background-color: blue;
+      aspect-ratio: 1;
+      background-color: #444;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 32px;
+      font-weight: bold;
+      cursor: pointer;
+      color: white;
       border-radius: 5px;
     }
 
-    #scoreBoard {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      font-size: 20px;
+    .cell.winning {
+      background-color: #28a745;
     }
 
-    #gameOver {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      font-size: 24px;
-      display: none;
+    #status {
+      margin-top: 10px;
+    }
+
+    #leaderboard {
+      margin-top: 20px;
+      background-color: #333;
+      padding: 10px;
+      border-radius: 5px;
+      width: 90%;
+      max-width: 300px;
+      text-align: left;
+    }
+
+    #customizations {
+      margin-top: 20px;
     }
 
     button {
@@ -72,133 +79,183 @@
     button:hover {
       background-color: darkred;
     }
+
+    #symbolSelection {
+      margin: 20px 0;
+    }
+
+    select {
+      padding: 5px;
+    }
+
+    @media screen and (max-width: 500px) {
+      .cell {
+        font-size: 24px;
+      }
+    }
   </style>
 </head>
 <body>
-  <div id="gameArea">
-    <div id="player"></div>
-    <div id="scoreBoard">Score: 0</div>
-    <div id="gameOver">
-      <p>Game Over!</p>
-      <button onclick="restartGame()">Play Again</button>
+  <div id="gameContainer">
+    <div id="customizations">
+      <div id="symbolSelection">
+        <label for="playerSymbol">Choose your symbol:</label>
+        <select id="playerSymbol" onchange="setPlayerSymbols()">
+          <option value="X">X</option>
+          <option value="O">O</option>
+        </select>
+      </div>
+      <button onclick="startGame('AI')">Play Against AI</button>
+      <button onclick="startGame('2P')">Play Two-Player</button>
+    </div>
+    <div id="gameBoard"></div>
+    <div id="status">
+      <p id="message">Click a button to start the game!</p>
+      <button onclick="resetGame()">Restart Game</button>
+    </div>
+    <div id="leaderboard">
+      <h3>Leaderboard</h3>
+      <p>Player Wins: <span id="playerWins">0</span></p>
+      <p>AI Wins: <span id="aiWins">0</span></p>
+      <p>Draws: <span id="draws">0</span></p>
     </div>
   </div>
 
   <script>
-    const gameArea = document.getElementById("gameArea");
-    const player = document.getElementById("player");
-    const scoreBoard = document.getElementById("scoreBoard");
-    const gameOverScreen = document.getElementById("gameOver");
+    let board = ["", "", "", "", "", "", "", "", ""];
+    let currentPlayer;
+    let isGameActive = false;
+    let gameMode = null;
+    let playerSymbol = "X";
+    let aiSymbol = "O";
+    let playerWins = 0;
+    let aiWins = 0;
+    let draws = 0;
 
-    let playerPosition = gameArea.offsetWidth / 2 - 15; // Initial player position
-    let isGameOver = false;
-    let score = 0;
-    let blockSpeed = 2;
-    let blockInterval = 2000;
+    const gameBoard = document.getElementById("gameBoard");
+    const message = document.getElementById("message");
+    const playerWinsDisplay = document.getElementById("playerWins");
+    const aiWinsDisplay = document.getElementById("aiWins");
+    const drawsDisplay = document.getElementById("draws");
 
-    // Set player position
-    function setPlayerPosition() {
-      player.style.left = `${playerPosition}px`;
+    const winningCombinations = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+
+    function createBoard() {
+      gameBoard.innerHTML = "";
+      board.forEach((cell, index) => {
+        const cellDiv = document.createElement("div");
+        cellDiv.classList.add("cell");
+        cellDiv.dataset.index = index;
+        cellDiv.innerText = cell;
+        cellDiv.addEventListener("click", () => handleCellClick(index));
+        gameBoard.appendChild(cellDiv);
+      });
     }
-    setPlayerPosition();
 
-    // Move player left and right with arrow keys
-    document.addEventListener("keydown", (e) => {
-      if (isGameOver) return;
-      const step = 15; // Movement step
-      if (e.key === "ArrowLeft" && playerPosition > 0) {
-        playerPosition -= step;
-      } else if (e.key === "ArrowRight" && playerPosition < gameArea.offsetWidth - player.offsetWidth) {
-        playerPosition += step;
-      }
-      setPlayerPosition();
-    });
+    function handleCellClick(index) {
+      if (board[index] !== "" || !isGameActive) return;
 
-    // Create and move blocks
-    function createBlock() {
-      if (isGameOver) return;
+      board[index] = currentPlayer;
+      createBoard();
+      checkResult();
 
-      const block = document.createElement("div");
-      block.classList.add("block");
-      const blockPosition = Math.random() * (gameArea.offsetWidth - 40); // Random position
-      block.style.left = `${blockPosition}px`;
-      gameArea.appendChild(block);
-
-      let blockTop = 0;
-
-      const moveBlock = setInterval(() => {
-        if (isGameOver) {
-          clearInterval(moveBlock);
-          block.remove();
-          return;
+      if (isGameActive) {
+        currentPlayer = currentPlayer === playerSymbol ? aiSymbol : playerSymbol;
+        if (gameMode === "AI" && currentPlayer === aiSymbol) {
+          setTimeout(aiMove, 500);
+        } else {
+          message.innerText = `Player ${currentPlayer}'s turn`;
         }
-
-        blockTop += blockSpeed;
-        block.style.top = `${blockTop}px`;
-
-        // Check collision with the player
-        if (checkCollision(block)) {
-          endGame();
-          clearInterval(moveBlock);
-          return;
-        }
-
-        // Remove block if it goes out of bounds
-        if (blockTop > gameArea.offsetHeight) {
-          block.remove();
-          clearInterval(moveBlock);
-          score++;
-          updateScore();
-        }
-      }, 16);
-
-      // Increase difficulty over time
-      if (score % 10 === 0 && blockSpeed < 10) {
-        blockSpeed += 0.2;
       }
     }
 
-    // Check collision between player and block
-    function checkCollision(block) {
-      const blockRect = block.getBoundingClientRect();
-      const playerRect = player.getBoundingClientRect();
+    function aiMove() {
+      const emptyCells = board
+        .map((cell, index) => (cell === "" ? index : null))
+        .filter((index) => index !== null);
 
-      return !(
-        blockRect.bottom < playerRect.top ||
-        blockRect.top > playerRect.bottom ||
-        blockRect.right < playerRect.left ||
-        blockRect.left > playerRect.right
-      );
-    }
+      const randomIndex = Math.floor(Math.random() * emptyCells.length);
+      const aiChoice = emptyCells[randomIndex];
 
-    // Update the score on the scoreboard
-    function updateScore() {
-      scoreBoard.innerText = `Score: ${score}`;
-    }
+      board[aiChoice] = aiSymbol;
+      createBoard();
+      checkResult();
 
-    // End the game
-    function endGame() {
-      isGameOver = true;
-      gameOverScreen.style.display = "block";
-    }
-
-    // Restart the game
-    function restartGame() {
-      isGameOver = false;
-      score = 0;
-      blockSpeed = 2;
-      updateScore();
-      gameOverScreen.style.display = "none";
-      playerPosition = gameArea.offsetWidth / 2 - 15;
-      setPlayerPosition();
-    }
-
-    // Generate blocks at intervals
-    setInterval(() => {
-      if (!isGameOver) {
-        createBlock();
+      if (isGameActive) {
+        currentPlayer = playerSymbol;
+        message.innerText = `Player ${currentPlayer}'s turn`;
       }
-    }, blockInterval);
+    }
+
+    function checkResult() {
+      let winner = null;
+
+      for (const combination of winningCombinations) {
+        const [a, b, c] = combination;
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+          winner = board[a];
+          document.querySelectorAll(".cell").forEach((cell, index) => {
+            if (combination.includes(index)) {
+              cell.classList.add("winning");
+            }
+          });
+          break;
+        }
+      }
+
+      if (winner) {
+        isGameActive = false;
+        if (winner === playerSymbol) {
+          playerWins++;
+          playerWinsDisplay.innerText = playerWins;
+          message.innerText = "You win!";
+        } else {
+          aiWins++;
+          aiWinsDisplay.innerText = aiWins;
+          message.innerText = "AI wins!";
+        }
+        return;
+      }
+
+      if (!board.includes("")) {
+        isGameActive = false;
+        draws++;
+        drawsDisplay.innerText = draws;
+        message.innerText = "It's a draw!";
+      }
+    }
+
+    function resetGame() {
+      board = ["", "", "", "", "", "", "", "", ""];
+      currentPlayer = playerSymbol;
+      isGameActive = true;
+      message.innerText = `Player ${currentPlayer}'s turn`;
+      createBoard();
+    }
+
+    function setPlayerSymbols() {
+      playerSymbol = document.getElementById("playerSymbol").value;
+      aiSymbol = playerSymbol === "X" ? "O" : "X";
+    }
+
+    function startGame(mode) {
+      gameMode = mode;
+      currentPlayer = playerSymbol;
+      isGameActive = true;
+      message.innerText = `Player ${currentPlayer}'s turn`;
+      resetGame();
+    }
+
+    createBoard();
   </script>
 </body>
 </html>
