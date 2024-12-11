@@ -1,17 +1,162 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Details</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>No Internet - Kangaroo Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+    }
+    canvas {
+      display: block;
+      margin: 20px auto;
+      background-color: #fff;
+      border: 2px solid #000;
+    }
+    #offline-message {
+      color: red;
+      font-size: 18px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Internet connection have been inturrepted, try reconnecting WiFi or Celluar data </h1>
-    <p>..............</p>
+  <div id="offline-message">
+    <h1>No Internet</h1>
+    <p>Try:</p>
+    <ul>
+      <li>Checking the network cables, modem, and router</li>
+      <li>Reconnecting to Wi-Fi</li>
+    </ul>
+    <p><strong>ERR_INTERNET_DISCONNECTED</strong></p>
+    <p>Press the spacebar to jump over obstacles!</p>
+  </div>
+  <canvas id="gameCanvas" width="800" height="300"></canvas>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Kangaroo properties
+    const kangaroo = {
+      x: 50,
+      y: 250,
+      width: 40,
+      height: 40,
+      color: "brown",
+      velocityY: 0,
+      isJumping: false,
+    };
+
+    // Obstacle properties
+    const obstacles = [];
+    const obstacleFrequency = 2000; // Every 2 seconds
+    let gameSpeed = 5;
+
+    // Gravity
+    const gravity = 0.8;
+
+    // Game variables
+    let score = 0;
+    let gameOver = false;
+
+    // Function to draw the kangaroo
+    function drawKangaroo() {
+      ctx.fillStyle = kangaroo.color;
+      ctx.fillRect(kangaroo.x, kangaroo.y, kangaroo.width, kangaroo.height);
+    }
+
+    // Function to generate obstacles
+    function generateObstacle() {
+      if (gameOver) return;
+
+      const obstacleHeight = Math.random() * 50 + 20; // Random height between 20 and 70
+      obstacles.push({
+        x: canvas.width,
+        y: canvas.height - obstacleHeight,
+        width: 30,
+        height: obstacleHeight,
+        color: "black",
+      });
+    }
+
+    // Function to draw obstacles
+    function drawObstacles() {
+      obstacles.forEach((obstacle, index) => {
+        obstacle.x -= gameSpeed;
+
+        // Remove obstacle if it goes off-screen
+        if (obstacle.x + obstacle.width < 0) {
+          obstacles.splice(index, 1);
+          score++;
+        }
+
+        // Draw obstacle
+        ctx.fillStyle = obstacle.color;
+        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+
+        // Check for collision
+        if (
+          kangaroo.x < obstacle.x + obstacle.width &&
+          kangaroo.x + kangaroo.width > obstacle.x &&
+          kangaroo.y < obstacle.y + obstacle.height &&
+          kangaroo.y + kangaroo.height > obstacle.y
+        ) {
+          gameOver = true;
+        }
+      });
+    }
+
+    // Function to handle the game loop
+    function gameLoop() {
+      if (gameOver) {
+        ctx.fillStyle = "red";
+        ctx.font = "30px Arial";
+        ctx.fillText("Game Over!", canvas.width / 2 - 70, canvas.height / 2);
+        return;
+      }
+
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw kangaroo and obstacles
+      drawKangaroo();
+      drawObstacles();
+
+      // Apply gravity
+      if (kangaroo.y + kangaroo.height < canvas.height) {
+        kangaroo.velocityY += gravity;
+      } else {
+        kangaroo.isJumping = false; // Reset jump
+        kangaroo.velocityY = 0;
+      }
+
+      kangaroo.y += kangaroo.velocityY;
+
+      // Prevent kangaroo from falling below ground
+      if (kangaroo.y + kangaroo.height > canvas.height) {
+        kangaroo.y = canvas.height - kangaroo.height;
+      }
+
+      // Request next frame
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Event listener for jumping
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space" && !kangaroo.isJumping) {
+        kangaroo.velocityY = -15; // Jump height
+        kangaroo.isJumping = true;
+      }
+    });
+
+    // Start the game
+    setInterval(generateObstacle, obstacleFrequency);
+    gameLoop();
+  </script>
 </body>
 </html>
