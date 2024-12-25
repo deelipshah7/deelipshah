@@ -26,10 +26,10 @@
 
         .wave span {
             display: inline-block;
-            animation: wave 1.5s infinite;
-            animation-delay: calc(var(--i) * 0.1s);
+            animation: wave 1.5s ease-in-out forwards;
         }
 
+        /* Keyframe for the wave animation */
         @keyframes wave {
             0%, 100% {
                 transform: translateY(0);
@@ -38,6 +38,33 @@
                 transform: translateY(-15px);
             }
         }
+
+        /* Applying animation delay to each letter */
+        .wave span:nth-child(1) { animation-delay: 0s; }
+        .wave span:nth-child(2) { animation-delay: 0.2s; }
+        .wave span:nth-child(3) { animation-delay: 0.4s; }
+        .wave span:nth-child(4) { animation-delay: 0.6s; }
+        .wave span:nth-child(5) { animation-delay: 0.8s; }
+        .wave span:nth-child(6) { animation-delay: 1s; }
+        .wave span:nth-child(7) { animation-delay: 1.2s; }
+        .wave span:nth-child(8) { animation-delay: 1.4s; }
+        .wave span:nth-child(9) { animation-delay: 1.6s; }
+        .wave span:nth-child(10) { animation-delay: 1.8s; }
+        .wave span:nth-child(11) { animation-delay: 2s; }
+        .wave span:nth-child(12) { animation-delay: 2.2s; }
+        .wave span:nth-child(13) { animation-delay: 2.4s; }
+        .wave span:nth-child(14) { animation-delay: 2.6s; }
+        .wave span:nth-child(15) { animation-delay: 2.8s; }
+        .wave span:nth-child(16) { animation-delay: 3s; }
+        .wave span:nth-child(17) { animation-delay: 3.2s; }
+        .wave span:nth-child(18) { animation-delay: 3.4s; }
+        .wave span:nth-child(19) { animation-delay: 3.6s; }
+        .wave span:nth-child(20) { animation-delay: 3.8s; }
+        .wave span:nth-child(21) { animation-delay: 4s; }
+        .wave span:nth-child(22) { animation-delay: 4.2s; }
+        .wave span:nth-child(23) { animation-delay: 4.4s; }
+        .wave span:nth-child(24) { animation-delay: 4.6s; }
+        .wave span:nth-child(25) { animation-delay: 4.8s; }
 
         @media (max-width: 600px) {
             .wave {
