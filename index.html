@@ -23,6 +23,9 @@
         button:hover {
             background-color: #0056b3;
         }
+        .shift-entry {
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -40,13 +43,11 @@
     <div id="mainApp">
         <h1>Shift Scheduler and Tax Calculator</h1>
         <button onclick="logout()">Logout</button>
-        <div id="shiftScheduler">
-            <!-- Days will be added dynamically -->
-        </div>
+        <div id="shiftScheduler"></div>
         <button onclick="saveWeek()">Save Shifts for the Week</button>
         <button onclick="calculateEarnings()">Calculate Earnings</button>
         <button onclick="viewHistory()">View Saved Data</button>
-        <div id="output" class="output"></div>
+        <div id="output"></div>
     </div>
 
     <script>
@@ -68,6 +69,7 @@
                 sessionStorage.setItem("loggedIn", "true");
                 document.getElementById("loginScreen").style.display = "none";
                 document.getElementById("mainApp").style.display = "block";
+                initScheduler();
             } else {
                 alert("Invalid username or password.");
             }
@@ -79,17 +81,19 @@
             document.getElementById("loginScreen").style.display = "block";
         }
 
-        // Check if user is logged in
         if (sessionStorage.getItem("loggedIn")) {
             document.getElementById("mainApp").style.display = "block";
+            initScheduler();
         } else {
             document.getElementById("loginScreen").style.display = "block";
         }
 
-        // Initialize scheduler
+        // Initialize the shift scheduler
         function initScheduler() {
             const container = document.getElementById("shiftScheduler");
+            container.innerHTML = ""; // Clear previous content
             weekdays.forEach(day => {
+                shifts[day] = [];
                 const dayContainer = document.createElement("div");
                 dayContainer.innerHTML = `
                     <h3>${day}</h3>
@@ -101,10 +105,107 @@
             });
         }
 
-        // Other functions (addShift, markNotWorked, removeShift, saveWeek, calculateEarnings, calculateTax, viewHistory) 
-        // remain the same as in the previous code.
+        function addShift(day) {
+            const shiftContainer = document.getElementById(`${day}-shifts`);
+            const shiftEntry = document.createElement("div");
+            shiftEntry.classList.add("shift-entry");
 
-        initScheduler();
+            shiftEntry.innerHTML = `
+                Start Time: <input type="time" class="start-time" required>
+                End Time: <input type="time" class="end-time" required>
+                <button onclick="removeShift(this)">Remove</button>
+            `;
+
+            shiftContainer.appendChild(shiftEntry);
+        }
+
+        function markNotWorked(day) {
+            shifts[day] = "Not Worked";
+            document.getElementById(`${day}-shifts`).innerHTML = "<p>Not Worked</p>";
+        }
+
+        function removeShift(button) {
+            button.parentElement.remove();
+        }
+
+        function saveWeek() {
+            weekdays.forEach(day => {
+                const shiftContainer = document.getElementById(`${day}-shifts`);
+                const shiftEntries = shiftContainer.querySelectorAll(".shift-entry");
+
+                if (shiftEntries.length > 0) {
+                    shifts[day] = [];
+                    shiftEntries.forEach(entry => {
+                        const startTime = entry.querySelector(".start-time").value;
+                        const endTime = entry.querySelector(".end-time").value;
+                        if (startTime && endTime) {
+                            shifts[day].push({ startTime, endTime });
+                        }
+                    });
+                }
+            });
+
+            const weekData = { date: new Date().toLocaleDateString(), shifts: { ...shifts } };
+            savedData.push(weekData);
+            alert("Shifts saved for the week!");
+        }
+
+        function calculateEarnings() {
+            let totalEarnings = 0;
+            const weekdayRate = 32.07;
+            const weekendRate = {
+                Saturday: 38.48,
+                Sunday: 44.89
+            };
+
+            weekdays.forEach(day => {
+                if (shifts[day] !== "Not Worked" && shifts[day].length) {
+                    shifts[day].forEach(shift => {
+                        const [startHour] = shift.startTime.split(":").map(Number);
+                        const rate = weekendRate[day] || weekdayRate;
+
+                        // Assume 1-hour shifts for simplicity in this example
+                        totalEarnings += rate; 
+                    });
+                }
+            });
+
+            const tax = calculateTax(totalEarnings);
+            document.getElementById("output").innerHTML = `
+                <p>Total Earnings: $${totalEarnings.toFixed(2)}</p>
+                <p>Tax Deduction: $${tax.amount.toFixed(2)} (${tax.rate}%)</p>
+                <p>Net Income: $${(totalEarnings - tax.amount).toFixed(2)}</p>
+            `;
+        }
+
+        function calculateTax(income) {
+            let tax = 0;
+            let rate = 0;
+
+            if (income > 190000) {
+                tax = 51638 + 0.45 * (income - 190000);
+                rate = 45;
+            } else if (income > 135000) {
+                tax = 31288 + 0.37 * (income - 135000);
+                rate = 37;
+            } else if (income > 45000) {
+                tax = 4288 + 0.30 * (income - 45000);
+                rate = 30;
+            } else if (income > 18200) {
+                tax = 0.16 * (income - 18200);
+                rate = 16;
+            }
+
+            return { amount: tax, rate };
+        }
+
+        function viewHistory() {
+            const history = savedData.map((data, index) => `
+                <p><b>Week ${index + 1} (${data.date}):</b></p>
+                <pre>${JSON.stringify(data.shifts, null, 2)}</pre>
+            `).join("<hr>");
+            document.getElementById("output").innerHTML = history || "<p>No data saved yet.</p>";
+        }
     </script>
 </body>
 </html>
