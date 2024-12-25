@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shift Scheduler with Authentication</title>
+    <title>Shift Scheduler with Break Time</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -113,6 +113,7 @@
             shiftEntry.innerHTML = `
                 Start Time: <input type="time" class="start-time" required>
                 End Time: <input type="time" class="end-time" required>
+                Break (minutes): <input type="number" class="break-time" min="0" value="0" required>
                 <button onclick="removeShift(this)">Remove</button>
             `;
 
@@ -138,8 +139,10 @@
                     shiftEntries.forEach(entry => {
                         const startTime = entry.querySelector(".start-time").value;
                         const endTime = entry.querySelector(".end-time").value;
+                        const breakTime = parseInt(entry.querySelector(".break-time").value) || 0;
+
                         if (startTime && endTime) {
-                            shifts[day].push({ startTime, endTime });
+                            shifts[day].push({ startTime, endTime, breakTime });
                         }
                     });
                 }
@@ -161,11 +164,16 @@
             weekdays.forEach(day => {
                 if (shifts[day] !== "Not Worked" && shifts[day].length) {
                     shifts[day].forEach(shift => {
-                        const [startHour] = shift.startTime.split(":").map(Number);
-                        const rate = weekendRate[day] || weekdayRate;
+                        const [startHour, startMinute] = shift.startTime.split(":").map(Number);
+                        const [endHour, endMinute] = shift.endTime.split(":").map(Number);
+                        const breakTime = shift.breakTime;
 
-                        // Assume 1-hour shifts for simplicity in this example
-                        totalEarnings += rate; 
+                        const startInMinutes = startHour * 60 + startMinute;
+                        const endInMinutes = endHour * 60 + endMinute;
+                        const totalMinutesWorked = endInMinutes - startInMinutes - breakTime;
+
+                        const rate = weekendRate[day] || weekdayRate;
+                        totalEarnings += (totalMinutesWorked / 60) * rate;
                     });
                 }
             });
