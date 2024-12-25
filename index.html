@@ -3,200 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Website Under Construction</title>
+    <title>Shift Scheduler and Tax Calculator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
+            margin: 20px;
+        }
+        .day-container {
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+        .shift-container {
             display: flex;
-            justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            flex-direction: column;
-        }
-        .hidden {
-            display: none;
-        }
-        h1 {
-            font-size: 36px;
-            text-align: center;
-        }
-        .login-form, .work-form, .results {
-            border: 1px solid #ccc;
-            padding: 20px;
-            background: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
-            margin-top: 20px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        input[type="text"], input[type="password"], input[type="time"] {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-        }
-        .day-row {
+            gap: 10px;
             margin-bottom: 10px;
         }
-        .results {
-            text-align: left;
-        }
-        .button {
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
-            text-align: center;
-            display: block;
-            margin-top: 10px;
-            text-decoration: none;
+        button {
+            padding: 5px 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .output {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <div id="under-construction">
-        <h1>Website Under Construction</h1>
+    <h1>Shift Scheduler and Tax Calculator</h1>
+    <div id="shiftScheduler">
+        <!-- Days will be added dynamically -->
     </div>
-    <div id="login" class="login-form hidden">
-        <h2>Sign In</h2>
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username">
-        </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password">
-        </div>
-        <button class="button" onclick="login()">Login</button>
-    </div>
-    <div id="work-schedule" class="work-form hidden">
-        <h2>Enter Your Work Schedule</h2>
-        <div id="days">
-            <!-- Days will be dynamically added here -->
-        </div>
-        <button class="button" onclick="calculateEarnings()">Calculate Earnings</button>
-    </div>
-    <div id="results" class="results hidden">
-        <h2>Weekly Summary</h2>
-        <p id="earnings"></p>
-        <p id="tax"></p>
-        <p id="subtotal"></p>
-    </div>
+    <button onclick="saveWeek()">Save Shifts for the Week</button>
+    <button onclick="calculateEarnings()">Calculate Earnings</button>
+    <button onclick="viewHistory()">View Saved Data</button>
+
+    <div id="output" class="output"></div>
 
     <script>
-        // Predefined login credentials
-        const validUsername = "sudurpaschim99";
-        const validPassword = "01llabtoofissem";
+        const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+        const shifts = {};
+        const savedData = [];
 
-        // Rates and tax brackets
-        const rates = {
-            weekday: { day: 32.07, earlyNight: 39.76 },
-            saturday: { day: 38.48, earlyNight: 44.89 },
-            sunday: { day: 44.89, earlyNight: 51.31 }
-        };
-        const taxBrackets = [
-            { min: 0, max: 18200, rate: 0 },
-            { min: 18201, max: 45000, rate: 0.16, base: 0 },
-            { min: 45001, max: 135000, rate: 0.30, base: 4288 },
-            { min: 135001, max: 190000, rate: 0.37, base: 31288 },
-            { min: 190001, rate: 0.45, base: 51638 }
-        ];
+        // Initialize scheduler
+        function initScheduler() {
+            const container = document.getElementById("shiftScheduler");
+            weekdays.forEach(day => {
+                const dayContainer = document.createElement("div");
+                dayContainer.className = "day-container";
+                dayContainer.innerHTML = `
+                    <h3>${day}</h3>
+                    <button onclick="addShift('${day}')">Add Shift</button>
+                    <button onclick="markNotWorked('${day}')">Not Worked</button>
+                    <div id="${day}-shifts"></div>
+                `;
+                container.appendChild(dayContainer);
+            });
+        }
 
-        const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
-        // Show login form
-        document.getElementById("under-construction").classList.add("hidden");
-        document.getElementById("login").classList.remove("hidden");
-
-        // Populate work schedule form
-        const daysContainer = document.getElementById("days");
-        daysOfWeek.forEach(day => {
-            const dayDiv = document.createElement("div");
-            dayDiv.classList.add("day-row");
-            dayDiv.innerHTML = `
-                <strong>${day}</strong><br>
-                <label>Shift Start:</label>
-                <input type="time" class="start" data-day="${day}">
-                <label>Shift End:</label>
-                <input type="time" class="end" data-day="${day}">
-                <label><input type="checkbox" class="not-worked" data-day="${day}"> Not Worked</label>
+        // Add a shift for a day
+        function addShift(day) {
+            const shiftsContainer = document.getElementById(`${day}-shifts`);
+            const shiftDiv = document.createElement("div");
+            shiftDiv.className = "shift-container";
+            shiftDiv.innerHTML = `
+                Start: <input type="time" required> End: <input type="time" required>
+                <button onclick="removeShift(this)">Remove</button>
             `;
-            daysContainer.appendChild(dayDiv);
-        });
+            shiftsContainer.appendChild(shiftDiv);
+        }
 
-        // Handle login
-        function login() {
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
-            if (username === validUsername && password === validPassword) {
-                document.getElementById("login").classList.add("hidden");
-                document.getElementById("work-schedule").classList.remove("hidden");
-            } else {
-                alert("Invalid credentials!");
+        // Mark a day as not worked
+        function markNotWorked(day) {
+            const shiftsContainer = document.getElementById(`${day}-shifts`);
+            shiftsContainer.innerHTML = "<p>Not worked.</p>";
+            shifts[day] = [];
+        }
+
+        // Remove a shift
+        function removeShift(button) {
+            button.parentElement.remove();
+        }
+
+        // Save the week's data
+        function saveWeek() {
+            const weekData = {};
+            weekdays.forEach(day => {
+                const dayShifts = document.querySelectorAll(`#${day}-shifts .shift-container`);
+                const dayData = [];
+                dayShifts.forEach(shift => {
+                    const start = shift.querySelector("input:nth-of-type(1)").value;
+                    const end = shift.querySelector("input:nth-of-type(2)").value;
+                    if (start && end) {
+                        dayData.push({ start, end });
+                    }
+                });
+                weekData[day] = dayData;
+            });
+            const weekStartDate = prompt("Enter the start date of the week (YYYY-MM-DD):");
+            if (weekStartDate) {
+                savedData.push({ weekStartDate, shifts: weekData });
+                alert("Week's data saved!");
             }
         }
 
-        // Calculate earnings and tax
+        // Calculate weekly earnings and tax
         function calculateEarnings() {
             let totalEarnings = 0;
-            document.querySelectorAll(".day-row").forEach(row => {
-                const day = row.querySelector(".start").dataset.day;
-                const start = row.querySelector(".start").value;
-                const end = row.querySelector(".end").value;
-                const notWorked = row.querySelector(".not-worked").checked;
 
-                if (notWorked || !start || !end) return;
-
-                const startHour = parseInt(start.split(":")[0]);
-                const endHour = parseInt(end.split(":")[0]);
-                const rateType = getRateType(day, startHour, endHour);
-                const rate = rates[getDayType(day)][rateType];
-                totalEarnings += (endHour - startHour) * rate;
+            // Loop through each day's shifts
+            weekdays.forEach(day => {
+                const dayShifts = document.querySelectorAll(`#${day}-shifts .shift-container`);
+                dayShifts.forEach(shift => {
+                    const start = shift.querySelector("input:nth-of-type(1)").value;
+                    const end = shift.querySelector("input:nth-of-type(2)").value;
+                    const earning = calculateShiftEarnings(day, start, end);
+                    totalEarnings += earning;
+                });
             });
 
-            const tax = calculateTax(totalEarnings);
-            const netEarnings = totalEarnings - tax.amount;
+            // Calculate tax
+            const taxData = calculateTax(totalEarnings);
 
             // Display results
-            document.getElementById("work-schedule").classList.add("hidden");
-            document.getElementById("results").classList.remove("hidden");
-            document.getElementById("earnings").innerText = `Total Earnings: $${totalEarnings.toFixed(2)}`;
-            document.getElementById("tax").innerText = `Tax Deduction: $${tax.amount.toFixed(2)} (${tax.rate * 100}%)`;
-            document.getElementById("subtotal").innerText = `Earnings After Tax: $${netEarnings.toFixed(2)}`;
+            const output = document.getElementById("output");
+            output.innerHTML = `
+                <h3>Weekly Summary</h3>
+                <p>Total Earnings: $${totalEarnings.toFixed(2)}</p>
+                <p>Tax Deduction: $${taxData.tax.toFixed(2)} (${taxData.rate}%)</p>
+                <p>Net Earnings: $${(totalEarnings - taxData.tax).toFixed(2)}</p>
+            `;
         }
 
-        // Get rate type based on shift hours
-        function getRateType(day, startHour, endHour) {
-            if (startHour >= 4 && endHour <= 11) return "earlyNight";
-            if (startHour >= 18 || endHour <= 4) return "earlyNight";
-            return "day";
-        }
+        // Calculate shift earnings based on rules
+        function calculateShiftEarnings(day, start, end) {
+            if (!start || !end) return 0;
+            const startTime = parseFloat(start.replace(":", "."));
+            const endTime = parseFloat(end.replace(":", "."));
+            let hourlyRate = 32.07; // Default weekday rate
 
-        // Get day type (weekday, saturday, sunday)
-        function getDayType(day) {
-            if (day === "Saturday") return "saturday";
-            if (day === "Sunday") return "sunday";
-            return "weekday";
-        }
-
-        // Calculate tax based on total earnings
-        function calculateTax(totalEarnings) {
-            for (const bracket of taxBrackets) {
-                if (!bracket.max || totalEarnings <= bracket.max) {
-                    const base = bracket.base || 0;
-                    const rate = bracket.rate || 0;
-                    return { amount: base + (totalEarnings - bracket.min) * rate, rate };
-                }
+            if (["Saturday", "Sunday"].includes(day)) {
+                hourlyRate = day === "Saturday" ? 38.48 : 44.89;
             }
+
+            // Adjust for night and early morning shifts
+            if ((startTime >= 4 && endTime <= 11.5) || (startTime >= 18 || endTime <= 11.5)) {
+                hourlyRate += day === "Saturday" ? 6.41 : day === "Sunday" ? 6.42 : 7.69;
+            }
+
+            return (endTime - startTime) * hourlyRate;
         }
+
+        // Calculate tax
+        function calculateTax(income) {
+            if (income <= 18200) return { tax: 0, rate: 0 };
+            if (income <= 45000) return { tax: (income - 18200) * 0.16, rate: 16 };
+            if (income <= 135000) return { tax: 4288 + (income - 45000) * 0.30, rate: 30 };
+            if (income <= 190000) return { tax: 31288 + (income - 135000) * 0.37, rate: 37 };
+            return { tax: 51638 + (income - 190000) * 0.45, rate: 45 };
+        }
+
+        // View saved historical data
+        function viewHistory() {
+            const output = document.getElementById("output");
+            output.innerHTML = "<h3>Saved Data</h3>";
+            savedData.forEach(data => {
+                const shiftsSummary = weekdays.map(day => {
+                    const shifts = data.shifts[day];
+                    if (shifts && shifts.length) {
+                        return `<strong>${day}:</strong> ${shifts.map(s => `${s.start} to ${s.end}`).join(", ")}`;
+                    }
+                    return `<strong>${day}:</strong> Not worked.`;
+                }).join("<br>");
+                output.innerHTML += `<p><strong>Week Starting:</strong> ${data.weekStartDate}<br>${shiftsSummary}</p>`;
+            });
+        }
+
+        // Initialize the page
+        initScheduler();
     </script>
 </body>
 </html>
