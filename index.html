@@ -155,6 +155,8 @@
 
         function calculateEarnings() {
             let totalEarnings = 0;
+            let totalHoursWorked = 0;
+
             const weekdayRate = 32.07;
             const weekendRate = {
                 Saturday: 38.48,
@@ -171,6 +173,9 @@
                         const startInMinutes = startHour * 60 + startMinute;
                         const endInMinutes = endHour * 60 + endMinute;
                         const totalMinutesWorked = endInMinutes - startInMinutes - breakTime;
+                        const totalHours = totalMinutesWorked / 60;
+
+                        totalHoursWorked += totalHours;
 
                         const rate = weekendRate[day] || weekdayRate;
                         totalEarnings += (totalMinutesWorked / 60) * rate;
@@ -178,11 +183,18 @@
                 }
             });
 
-            const tax = calculateTax(totalEarnings);
+            // Estimate annual income based on weekly earnings
+            const estimatedAnnualIncome = totalEarnings * 52;
+
+            // Calculate tax based on annual income
+            const tax = calculateTax(estimatedAnnualIncome);
+
             document.getElementById("output").innerHTML = `
-                <p>Total Earnings: $${totalEarnings.toFixed(2)}</p>
-                <p>Tax Deduction: $${tax.amount.toFixed(2)} (${tax.rate}%)</p>
-                <p>Net Income: $${(totalEarnings - tax.amount).toFixed(2)}</p>
+                <p>Total Earnings for the Week: $${totalEarnings.toFixed(2)}</p>
+                <p>Estimated Annual Income: $${estimatedAnnualIncome.toFixed(2)}</p>
+                <p>Tax Deduction (Estimated): $${tax.amount.toFixed(2)} (${tax.rate}%)</p>
+                <p>Net Income for the Week: $${(totalEarnings - tax.amount).toFixed(2)}</p>
+                <p>Worked Hours: ${totalHoursWorked.toFixed(2)} hours</p>
             `;
         }
 
