@@ -3,110 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Website Under Construction</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f4f4f4;
-        }
-
-        .wave {
-            display: inline-block;
-            font-size: 30px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .wave span {
-            display: inline-block;
-            opacity: 0;
-            transform: translateY(0);
-            animation: wave 1s ease-in-out forwards;
-        }
-
-        @keyframes wave {
-            0%, 100% {
-                transform: translateY(0);
-                opacity: 0;
-            }
-            50% {
-                transform: translateY(-15px);
-                opacity: 1;
-            }
-        }
-
-        /* Mobile-friendly design */
-        @media (max-width: 600px) {
-            .wave {
-                font-size: 20px;
-            }
-        }
-    </style>
+    <title>Gym Workout Tracker</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1 class="wave" id="waveText">
-        <span>W</span>
-        <span>e</span>
-        <span>b</span>
-        <span>s</span>
-        <span>i</span>
-        <span>t</span>
-        <span>e</span>
-        <span>&nbsp;</span> <!-- Space -->
-        <span>U</span>
-        <span>n</span>
-        <span>d</span>
-        <span>e</span>
-        <span>r</span>
-        <span>&nbsp;</span> <!-- Space -->
-        <span>C</span>
-        <span>o</span>
-        <span>n</span>
-        <span>s</span>
-        <span>t</span>
-        <span>r</span>
-        <span>u</span>
-        <span>c</span>
-        <span>t</span>
-        <span>i</span>
-        <span>o</span>
-        <span>n</span>
-        <span>!</span>
-    </h1>
+    <div class="container">
+        <div class="header">
+            <button id="startButton" class="start-btn">Start Workout</button>
+            <div id="timer" class="timer">00:00</div>
+        </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const letters = document.querySelectorAll('#waveText span');
-            let currentLetterIndex = 0;
-            const totalLetters = letters.length;
-            
-            function animateLetters() {
-                // Reset all letters to default state
-                letters.forEach(letter => {
-                    letter.style.opacity = '0';
-                    letter.style.transform = 'translateY(0)';
-                });
+        <div class="day-selector">
+            <div class="day" data-day="1">Day 1: Push + Legs</div>
+            <div class="day" data-day="2">Day 2: Pull + Hamstrings</div>
+            <div class="day" data-day="3">Day 3: Legs + Core</div>
+            <div class="day" data-day="4">Day 4: Push + Legs</div>
+            <div class="day" data-day="5">Day 5: Pull + Hamstrings</div>
+        </div>
 
-                // Animate one letter at a time
-                letters[currentLetterIndex].style.animation = 'wave 1s ease-in-out forwards';
-                letters[currentLetterIndex].style.opacity = '1';
-                letters[currentLetterIndex].style.transform = 'translateY(-15px)';
+        <div id="warmupModal" class="modal">
+            <div class="modal-content">
+                <h2>Warm-Up Required</h2>
+                <div id="warmupTimer">07:00</div>
+                <button id="startWarmup" class="btn">Start Warm-Up</button>
+            </div>
+        </div>
 
-                currentLetterIndex++;
+        <div id="workoutContainer" class="workout-container"></div>
+        <button id="finishButton" class="btn hidden">Finish Workout</button>
+    </div>
 
-                if (currentLetterIndex >= totalLetters) {
-                    currentLetterIndex = 0; // Reset to first letter after the last one
-                }
-            }
-
-            // Start the animation cycle
-            setInterval(animateLetters, 1000); // Adjust this for speed of animation
-        });
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
