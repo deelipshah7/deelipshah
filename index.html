@@ -2,37 +2,188 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gym Workout Tracker</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#4CAF50">
+    <title>Workout Planner</title>
+    <style>
+        *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;margin:0;padding:0;background-color:#f5f5f5;font-size:16px}.container{max-width:100%;min-height:100vh;padding:0;position:relative}.header{background-color:#4CAF50;color:#fff;padding:1rem;position:sticky;top:0;z-index:10;box-shadow:0 2px 4px rgba(0,0,0,.1)}.content{padding:1rem;padding-bottom:60px}.btn{display:block;width:calc(100% - 2rem);background-color:#4CAF50;color:#fff;padding:15px 20px;border:none;border-radius:8px;font-size:1.1rem;margin:0.5rem 1rem;cursor:pointer;transition:transform .1s;touch-action:manipulation}.btn:active{transform:scale(.98);background-color:#45a049}.list{list-style:none;padding:0;margin:0}.list-item{padding:1rem;margin:0.5rem 0;background:#fff;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.05);cursor:pointer;transition:transform .1s;min-height:60px;display:flex;align-items:center;justify-content:space-between}.list-item:active{transform:scale(.98)}.timer{font-size:2.5rem;text-align:center;padding:2rem;color:#333;font-weight:700}.progress-circle{width:100px;height:100px;margin:1rem auto;position:relative}.progress-circle svg{transform:rotate(-90deg)}.progress-circle circle{fill:none;stroke-width:8;stroke-linecap:round}.progress-circle-back{stroke:#eee}.progress-circle-front{stroke:#4CAF50;transition:stroke-dashoffset 1s linear}.back-btn{position:fixed;bottom:1rem;left:1rem;right:1rem;background-color:#e0e0e0;color:#333}.completed{background-color:#e8f5e9!important;color:#2e7d32!important}.set-buttons{display:grid;grid-template-columns:repeat(2,1fr);gap:0.5rem;margin:1rem 0}.set-btn{width:100%;padding:1rem;border-radius:8px;background:#f5f5f5;border:2px solid #ddd;color:#333}.set-btn.active{background:#4CAF50;color:#fff;border-color:#45a049}.checkmark{color:#2e7d32;font-weight:bold;margin-left:10px}
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <button id="startButton" class="start-btn">Start Workout</button>
-            <div id="timer" class="timer">00:00</div>
+            <h1 style="margin:0;font-size:1.5rem" id="headerTitle">Workout Planner</h1>
         </div>
-
-        <div class="day-selector">
-            <div class="day" data-day="1">Day 1: Push + Legs</div>
-            <div class="day" data-day="2">Day 2: Pull + Hamstrings</div>
-            <div class="day" data-day="3">Day 3: Legs + Core</div>
-            <div class="day" data-day="4">Day 4: Push + Legs</div>
-            <div class="day" data-day="5">Day 5: Pull + Hamstrings</div>
-        </div>
-
-        <div id="warmupModal" class="modal">
-            <div class="modal-content">
-                <h2>Warm-Up Required</h2>
-                <div id="warmupTimer">07:00</div>
-                <button id="startWarmup" class="btn">Start Warm-Up</button>
-            </div>
-        </div>
-
-        <div id="workoutContainer" class="workout-container"></div>
-        <button id="finishButton" class="btn hidden">Finish Workout</button>
+        <div class="content" id="screen"></div>
     </div>
 
-    <script src="app.js"></script>
+    <script>
+        const workoutPlan = [
+            {day:1,exercises:[
+                {name:"Warmup",type:"warmup"},
+                {name:"Flat Barbell Bench Press (Chest)",sets:4,rest:120},
+                {name:"Overhead Barbell Press (Shoulders)",sets:4,rest:120},
+                {name:"Incline Dumbbell Press (Upper Chest)",sets:3,rest:90},
+                {name:"Lateral Raises (Delts)",sets:3,rest:90},
+                {name:"Leg Press (Quads)",sets:3,rest:90},
+                {name:"Triceps Dips (Triceps)",sets:3,rest:90},
+                {name:"Seated Calf Raises (Calves)",sets:3,rest:90}
+            ]},
+            {day:2,exercises:[
+                {name:"Warmup",type:"warmup"},
+                {name:"Deadlifts (Posterior Chain)",sets:4,rest:120},
+                {name:"Pull-Ups (Lats)",sets:4,rest:90},
+                {name:"Bent-Over Rows (Mid-Back)",sets:4,rest:90},
+                {name:"Lying Leg Curls (Hamstrings)",sets:3,rest:90},
+                {name:"Face Pulls (Rear Delts)",sets:3,rest:60},
+                {name:"Barbell Curls (Biceps)",sets:3,rest:90},
+                {name:"Shrugs (Traps)",sets:3,rest:90}
+            ]},
+            {day:3,exercises:[
+                {name:"Warmup",type:"warmup"},
+                {name:"Back Squats (Quads)",sets:4,rest:120},
+                {name:"Romanian Deadlifts (Hamstrings)",sets:3,rest:90},
+                {name:"Walking Lunges (Glutes)",sets:3,rest:90},
+                {name:"Leg Extensions (Quads)",sets:3,rest:90},
+                {name:"Plank (Core)",sets:3,rest:90},
+                {name:"Hanging Leg Raises (Abs)",sets:3,rest:90}
+            ]},
+            {day:4,exercises:[
+                {name:"Warmup",type:"warmup"},
+                {name:"Incline Barbell Press (Upper Chest)",sets:4,rest:120},
+                {name:"Arnold Press (Shoulders)",sets:3,rest:90},
+                {name:"Decline Push-Ups (Lower Chest)",sets:3,rest:90},
+                {name:"Bulgarian Split Squats (Quads)",sets:3,rest:90},
+                {name:"Front Raises (Front Delts)",sets:3,rest:90},
+                {name:"Skull Crushers (Triceps)",sets:3,rest:90},
+                {name:"Standing Calf Raises (Calves)",sets:4,rest:90}
+            ]},
+            {day:5,exercises:[
+                {name:"Warmup",type:"warmup"},
+                {name:"Weighted Chin-Ups (Lats/Biceps)",sets:4,rest:90},
+                {name:"T-Bar Rows (Mid-Back)",sets:4,rest:90},
+                {name:"Glute-Ham Raises (Hamstrings)",sets:3,rest:90},
+                {name:"Reverse Pec Deck (Rear Delts)",sets:3,rest:90},
+                {name:"Hammer Curls (Biceps)",sets:3,rest:90},
+                {name:"Wrist Curls (Forearms)",sets:3,rest:60}
+            ]}
+        ];
+
+        let currentState = {day:null,exercise:null,currentSet:1,exerciseIndex:null};
+        let timerInterval = null;
+        let completedExercises = {};
+
+        function render(content){document.getElementById('screen').innerHTML=content}
+        function updateHeader(title){document.getElementById('headerTitle').textContent=title}
+
+        function showHome(){
+            updateHeader('Workout Planner');
+            render(`<button class="btn" onclick="showDays()">Start Workout</button>`);
+        }
+
+        function showDays(){
+            updateHeader('Select Day');
+            const days = workoutPlan.map(day=>`
+                <li class="list-item" onclick="selectDay(${day.day-1})">
+                    Day ${day.day}
+                    ${completedExercises[day.day]?.all ? '<span class="checkmark">✓</span>' : ''}
+                </li>
+            `).join('');
+            render(`<ul class="list">${days}</ul><button class="btn back-btn" onclick="showHome()">Back</button>`);
+        }
+
+        function selectDay(dayIndex){
+            currentState.day = workoutPlan[dayIndex];
+            showExercises();
+        }
+
+        function showExercises(){
+            updateHeader(`Day ${currentState.day.day}`);
+            const exercises = currentState.day.exercises.map((ex,i)=>`
+                <li class="list-item ${completedExercises[currentState.day.day]?.[i] ? 'completed' : ''}" onclick="selectExercise(${i})">
+                    <span>${i+1}. ${ex.name}</span>
+                    ${completedExercises[currentState.day.day]?.[i] ? '<span class="checkmark">✓</span>' : ''}
+                </li>
+            `).join('');
+            render(`<ul class="list">${exercises}</ul><button class="btn back-btn" onclick="showDays()">Back</button>`);
+        }
+
+        function selectExercise(exIndex){
+            currentState.exercise = currentState.day.exercises[exIndex];
+            currentState.exerciseIndex = exIndex;
+            currentState.currentSet = 1;
+            showExercise();
+        }
+
+        function showExercise(){
+            updateHeader(currentState.exercise.name);
+            if(currentState.exercise.type === 'warmup'){
+                render(`<div style="text-align:center;padding:2rem">
+                    <p style="color:#666">Complete your warmup routine</p>
+                    <button class="btn" onclick="completeWarmup()">Mark as Done</button>
+                </div><button class="btn back-btn" onclick="showExercises()">Back</button>`);
+            } else {
+                const sets = Array(currentState.exercise.sets).fill().map((_,i)=>`
+                    <button class="set-btn ${i<currentState.currentSet-1?'completed':''} ${i===currentState.currentSet-1?'active':'disabled'}" 
+                    ${i===currentState.currentSet-1?'onclick="startSet()"':''}>
+                        Set ${i+1}
+                        ${i<currentState.currentSet-1 ? '<span class="checkmark">✓</span>' : ''}
+                    </button>
+                `).join('');
+                render(`<div class="set-buttons">${sets}</div><div id="timerContainer"></div>
+                <button class="btn back-btn" onclick="showExercises()">Back</button>`);
+            }
+        }
+
+        function startSet(){
+            clearInterval(timerInterval);
+            const restTime = currentState.exercise.rest;
+            let timeLeft = restTime;
+            document.getElementById('timerContainer').innerHTML = `
+                <div class="timer">${timeLeft}s</div>
+                <div class="progress-circle">
+                    <svg viewBox="0 0 100 100">
+                        <circle class="progress-circle-back" cx="50" cy="50" r="45"/>
+                        <circle class="progress-circle-front" cx="50" cy="50" r="45"
+                            stroke-dasharray="283" stroke-dashoffset="${283*(1-timeLeft/restTime)}"/>
+                    </svg>
+                </div>`;
+            
+            timerInterval = setInterval(()=>{
+                timeLeft--;
+                document.querySelector('.timer').textContent = `${timeLeft}s`;
+                document.querySelector('.progress-circle-front').style.strokeDashoffset = 283*(1-timeLeft/restTime);
+                if(timeLeft <= 0){
+                    clearInterval(timerInterval);
+                    currentState.currentSet++;
+                    if(currentState.currentSet > currentState.exercise.sets){
+                        const day = currentState.day.day;
+                        const exIndex = currentState.exerciseIndex;
+                        completedExercises[day] = completedExercises[day] || {};
+                        completedExercises[day][exIndex] = true;
+                        alert('✅ All sets completed!');
+                        showExercises();
+                    } else {
+                        showExercise();
+                    }
+                }
+            },1000);
+        }
+
+        function completeWarmup(){
+            const day = currentState.day.day;
+            const exIndex = currentState.exerciseIndex;
+            completedExercises[day] = completedExercises[day] || {};
+            completedExercises[day][exIndex] = true;
+            alert('🔥 Warmup completed!');
+            showExercises();
+        }
+
+        showHome();
+        document.addEventListener('touchstart',function(e){
+            if(e.touches.length > 1) e.preventDefault();
+        },{passive:false});
+    </script>
 </body>
 </html>
