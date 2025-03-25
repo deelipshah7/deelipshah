@@ -20,170 +20,220 @@
 
     <script>
         const workoutPlan = [
-            {day:1,exercises:[
-                {name:"Warmup",type:"warmup"},
-                {name:"Flat Barbell Bench Press (Chest)",sets:4,rest:120},
-                {name:"Overhead Barbell Press (Shoulders)",sets:4,rest:120},
-                {name:"Incline Dumbbell Press (Upper Chest)",sets:3,rest:90},
-                {name:"Lateral Raises (Delts)",sets:3,rest:90},
-                {name:"Leg Press (Quads)",sets:3,rest:90},
-                {name:"Triceps Dips (Triceps)",sets:3,rest:90},
-                {name:"Seated Calf Raises (Calves)",sets:3,rest:90}
-            ]},
-            {day:2,exercises:[
-                {name:"Warmup",type:"warmup"},
-                {name:"Deadlifts (Posterior Chain)",sets:4,rest:120},
-                {name:"Pull-Ups (Lats)",sets:4,rest:90},
-                {name:"Bent-Over Rows (Mid-Back)",sets:4,rest:90},
-                {name:"Lying Leg Curls (Hamstrings)",sets:3,rest:90},
-                {name:"Face Pulls (Rear Delts)",sets:3,rest:60},
-                {name:"Barbell Curls (Biceps)",sets:3,rest:90},
-                {name:"Shrugs (Traps)",sets:3,rest:90}
-            ]},
-            {day:3,exercises:[
-                {name:"Warmup",type:"warmup"},
-                {name:"Back Squats (Quads)",sets:4,rest:120},
-                {name:"Romanian Deadlifts (Hamstrings)",sets:3,rest:90},
-                {name:"Walking Lunges (Glutes)",sets:3,rest:90},
-                {name:"Leg Extensions (Quads)",sets:3,rest:90},
-                {name:"Plank (Core)",sets:3,rest:90},
-                {name:"Hanging Leg Raises (Abs)",sets:3,rest:90}
-            ]},
-            {day:4,exercises:[
-                {name:"Warmup",type:"warmup"},
-                {name:"Incline Barbell Press (Upper Chest)",sets:4,rest:120},
-                {name:"Arnold Press (Shoulders)",sets:3,rest:90},
-                {name:"Decline Push-Ups (Lower Chest)",sets:3,rest:90},
-                {name:"Bulgarian Split Squats (Quads)",sets:3,rest:90},
-                {name:"Front Raises (Front Delts)",sets:3,rest:90},
-                {name:"Skull Crushers (Triceps)",sets:3,rest:90},
-                {name:"Standing Calf Raises (Calves)",sets:4,rest:90}
-            ]},
-            {day:5,exercises:[
-                {name:"Warmup",type:"warmup"},
-                {name:"Weighted Chin-Ups (Lats/Biceps)",sets:4,rest:90},
-                {name:"T-Bar Rows (Mid-Back)",sets:4,rest:90},
-                {name:"Glute-Ham Raises (Hamstrings)",sets:3,rest:90},
-                {name:"Reverse Pec Deck (Rear Delts)",sets:3,rest:90},
-                {name:"Hammer Curls (Biceps)",sets:3,rest:90},
-                {name:"Wrist Curls (Forearms)",sets:3,rest:60}
-            ]}
+            {
+                day: 1,
+                name: "Push (Chest, Shoulders, Triceps)",
+                exercises: [
+                    {name: "Flat Barbell Bench Press – 4x8-10 (Middle & Lower Chest)", sets: 4, rest: 120},
+                    {name: "Overhead Barbell Press – 4x8-10 (Front and Side Delts)", sets: 4, rest: 120},
+                    {name: "Incline Dumbbell Press – 3x10-12 (Upper Chest)", sets: 3, rest: 90},
+                    {name: "Lateral Raises – 3x12-15 (Side Delts)", sets: 3, rest: 60},
+                    {name: "Triceps Dips – 3x10-12 (Lateral and Medial head)", sets: 3, rest: 90},
+                    {name: "Overhead Triceps Extension – 3x10-12 (Long head)", sets: 3, rest: 90},
+                    {name: "Cable Fly – 3x15-20 (Forearms)", sets: 3, rest: 60},
+                    {name: "Plank – 3x100s (Abs)", sets: 3, rest: 60}
+                ]
+            },
+            {
+                day: 2,
+                name: "Pull (Back, Traps, Biceps)",
+                exercises: [
+                    {name: "Deadlifts – 4x5-6 (Posterior Chain)", sets: 4, rest: 180},
+                    {name: "Lat Pulldown – 4x8-10 (Lats)", sets: 4, rest: 120},
+                    {name: "Bent-Over Rows – 4x8-10 (Mid-Back)", sets: 4, rest: 120},
+                    {name: "Seated Cable Rows – 3x10-12 (Lats, Midback)", sets: 3, rest: 90},
+                    {name: "Face Pulls – 3x12-15 (Rear Delts)", sets: 3, rest: 60},
+                    {name: "Barbell Curls – 3x10-12 (Biceps)", sets: 3, rest: 90},
+                    {name: "Shrugs – 3x15 (Traps)", sets: 3, rest: 60},
+                    {name: "Hanging Leg Raises – 3x100s (Abs)", sets: 3, rest: 60}
+                ]
+            },
+            {
+                day: 3,
+                name: "Legs + Core",
+                exercises: [
+                    {name: "Back Squats – 4x8-10 (Quads)", sets: 4, rest: 120},
+                    {name: "Romanian Deadlifts – 3x10-12 (Hamstrings)", sets: 3, rest: 120},
+                    {name: "Walking Lunges – 3x12/leg (Glutes)", sets: 3, rest: 90},
+                    {name: "Leg Extensions – 3x12-15 (Quads)", sets: 3, rest: 90},
+                    {name: "Standing Calf Raises – 3x12-15 (Quads)", sets: 3, rest: 60},
+                    {name: "Russian Twist – 3x20 (Core)", sets: 3, rest: 60},
+                    {name: "Pallof Press – 3x12-15 (Core)", sets: 3, rest: 60},
+                    {name: "Bicycle Crunches – 3x12-15 (Core)", sets: 3, rest: 60}
+                ]
+            },
+            {
+                day: 4,
+                name: "Push (Chest, Shoulders, Triceps)",
+                exercises: [
+                    {name: "Incline Barbell Press – 4x8-10 (Upper Chest)", sets: 4, rest: 120},
+                    {name: "Arnold Press – 3x10-12 (Front and Side Delts)", sets: 3, rest: 90},
+                    {name: "Decline Barbell Press – 3x12-15 (Lower Chest)", sets: 3, rest: 90},
+                    {name: "Close Grip Bench Press – 3x10/leg (Lateral & Medial Triceps)", sets: 3, rest: 90},
+                    {name: "Front Raises – 3x12-15 (Front Delts)", sets: 3, rest: 60},
+                    {name: "Skull Crushers – 3x10-12 (All Triceps)", sets: 3, rest: 90},
+                    {name: "Flat Dumbbell Press – 4x8-10 (Middle Chest)", sets: 4, rest: 120},
+                    {name: "Bulgarian Split Squats – 3x12 (Legs)", sets: 3, rest: 90}
+                ]
+            },
+            {
+                day: 5,
+                name: "Pull (Back, Traps, Biceps)",
+                exercises: [
+                    {name: "Lat Pulldown – 4x8-10 (Lats)", sets: 4, rest: 120},
+                    {name: "T-Bar Rows – 4x8-10 (Mid-Back)", sets: 4, rest: 120},
+                    {name: "Seated Cable Rows – 3x10-12 (Lats, Midback)", sets: 3, rest: 90},
+                    {name: "Reverse Pec Deck – 3x12-15 (Rear Delts)", sets: 3, rest: 60},
+                    {name: "Hammer Curls – 3x10-12 (Biceps)", sets: 3, rest: 90},
+                    {name: "Wrist Curls – 3x15-20 (Forearms)", sets: 3, rest: 60},
+                    {name: "Hamstring Curls – 3x12 (Legs)", sets: 3, rest: 90}
+                ]
+            }
         ];
 
-        let currentState = {day:null,exercise:null,currentSet:1,exerciseIndex:null};
+        let currentState = {day: null, exercise: null, currentSet: 1, exerciseIndex: null};
         let timerInterval = null;
-        let completedExercises = {};
+        let completedExercises = JSON.parse(localStorage.getItem('workoutProgress')) || {};
 
-        function render(content){document.getElementById('screen').innerHTML=content}
-        function updateHeader(title){document.getElementById('headerTitle').textContent=title}
-
-        function showHome(){
-            updateHeader('Workout Planner');
-            render(`<button class="btn" onclick="showDays()">Start Workout</button>`);
+        function render(content) {
+            document.getElementById('screen').innerHTML = content;
         }
 
-        function showDays(){
-            updateHeader('Select Day');
-            const days = workoutPlan.map(day=>`
-                <li class="list-item" onclick="selectDay(${day.day-1})">
-                    Day ${day.day}
+        function updateHeader(title) {
+            document.getElementById('headerTitle').textContent = title;
+        }
+
+        function saveProgress() {
+            localStorage.setItem('workoutProgress', JSON.stringify(completedExercises));
+        }
+
+        function showHome() {
+            updateHeader('Workout Planner');
+            render(`
+                <button class="btn" onclick="showDays()">Start Workout</button>
+                <button class="btn" onclick="resetProgress()" style="background-color:#f44336">Reset Progress</button>
+            `);
+        }
+
+        function resetProgress() {
+            if (confirm("Are you sure you want to reset all your workout progress?")) {
+                completedExercises = {};
+                saveProgress();
+                showHome();
+            }
+        }
+
+        function showDays() {
+            updateHeader('Select Workout Day');
+            const days = workoutPlan.map(day => `
+                <li class="list-item" onclick="selectDay(${day.day - 1})">
+                    <div>
+                        <strong>Day ${day.day}: ${day.name}</strong>
+                        ${completedExercises[day.day]?.all ? '<div style="font-size:0.8em;color:#2e7d32">Completed</div>' : ''}
+                    </div>
                     ${completedExercises[day.day]?.all ? '<span class="checkmark">✓</span>' : ''}
                 </li>
             `).join('');
             render(`<ul class="list">${days}</ul><button class="btn back-btn" onclick="showHome()">Back</button>`);
         }
 
-        function selectDay(dayIndex){
+        function selectDay(dayIndex) {
             currentState.day = workoutPlan[dayIndex];
             showExercises();
         }
 
-        function showExercises(){
-            updateHeader(`Day ${currentState.day.day}`);
-            const exercises = currentState.day.exercises.map((ex,i)=>`
+        function showExercises() {
+            updateHeader(`Day ${currentState.day.day}: ${currentState.day.name}`);
+            const exercises = currentState.day.exercises.map((ex, i) => `
                 <li class="list-item ${completedExercises[currentState.day.day]?.[i] ? 'completed' : ''}" onclick="selectExercise(${i})">
-                    <span>${i+1}. ${ex.name}</span>
+                    <span>${i + 1}. ${ex.name} (${ex.sets}x, ${ex.rest}s rest)</span>
                     ${completedExercises[currentState.day.day]?.[i] ? '<span class="checkmark">✓</span>' : ''}
                 </li>
             `).join('');
             render(`<ul class="list">${exercises}</ul><button class="btn back-btn" onclick="showDays()">Back</button>`);
         }
 
-        function selectExercise(exIndex){
+        function selectExercise(exIndex) {
             currentState.exercise = currentState.day.exercises[exIndex];
             currentState.exerciseIndex = exIndex;
             currentState.currentSet = 1;
             showExercise();
         }
 
-        function showExercise(){
+        function showExercise() {
             updateHeader(currentState.exercise.name);
-            if(currentState.exercise.type === 'warmup'){
-                render(`<div style="text-align:center;padding:2rem">
-                    <p style="color:#666">Complete your warmup routine</p>
-                    <button class="btn" onclick="completeWarmup()">Mark as Done</button>
-                </div><button class="btn back-btn" onclick="showExercises()">Back</button>`);
-            } else {
-                const sets = Array(currentState.exercise.sets).fill().map((_,i)=>`
-                    <button class="set-btn ${i<currentState.currentSet-1?'completed':''} ${i===currentState.currentSet-1?'active':'disabled'}" 
-                    ${i===currentState.currentSet-1?'onclick="startSet()"':''}>
-                        Set ${i+1}
-                        ${i<currentState.currentSet-1 ? '<span class="checkmark">✓</span>' : ''}
-                    </button>
-                `).join('');
-                render(`<div class="set-buttons">${sets}</div><div id="timerContainer"></div>
-                <button class="btn back-btn" onclick="showExercises()">Back</button>`);
-            }
+            const sets = Array(currentState.exercise.sets).fill().map((_, i) => `
+                <button class="set-btn ${i < currentState.currentSet - 1 ? 'completed' : ''} ${i === currentState.currentSet - 1 ? 'active' : 'disabled'}" 
+                    ${i === currentState.currentSet - 1 ? 'onclick="startSet()"' : ''}>
+                    Set ${i + 1}
+                    ${i < currentState.currentSet - 1 ? '<span class="checkmark">✓</span>' : ''}
+                </button>
+            `).join('');
+            render(`
+                <div class="set-buttons">${sets}</div>
+                <div id="timerContainer"></div>
+                <button class="btn back-btn" onclick="showExercises()">Back</button>
+            `);
         }
 
-        function startSet(){
+        function startSet() {
             clearInterval(timerInterval);
             const restTime = currentState.exercise.rest;
             let timeLeft = restTime;
+            
             document.getElementById('timerContainer').innerHTML = `
-                <div class="timer">${timeLeft}s</div>
+                <div class="timer">${formatTime(timeLeft)}</div>
                 <div class="progress-circle">
                     <svg viewBox="0 0 100 100">
                         <circle class="progress-circle-back" cx="50" cy="50" r="45"/>
                         <circle class="progress-circle-front" cx="50" cy="50" r="45"
-                            stroke-dasharray="283" stroke-dashoffset="${283*(1-timeLeft/restTime)}"/>
+                            stroke-dasharray="283" stroke-dashoffset="${283 * (1 - timeLeft / restTime)}"/>
                     </svg>
                 </div>`;
             
-            timerInterval = setInterval(()=>{
+            timerInterval = setInterval(() => {
                 timeLeft--;
-                document.querySelector('.timer').textContent = `${timeLeft}s`;
-                document.querySelector('.progress-circle-front').style.strokeDashoffset = 283*(1-timeLeft/restTime);
-                if(timeLeft <= 0){
+                document.querySelector('.timer').textContent = formatTime(timeLeft);
+                document.querySelector('.progress-circle-front').style.strokeDashoffset = 283 * (1 - timeLeft / restTime);
+                
+                if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     currentState.currentSet++;
-                    if(currentState.currentSet > currentState.exercise.sets){
+                    
+                    if (currentState.currentSet > currentState.exercise.sets) {
                         const day = currentState.day.day;
                         const exIndex = currentState.exerciseIndex;
                         completedExercises[day] = completedExercises[day] || {};
                         completedExercises[day][exIndex] = true;
-                        alert('✅ All sets completed!');
+                        
+                        // Check if all exercises are completed for this day
+                        const allExercisesDone = currentState.day.exercises.every((_, i) => completedExercises[day]?.[i]);
+                        if (allExercisesDone) {
+                            completedExercises[day].all = true;
+                        }
+                        
+                        saveProgress();
                         showExercises();
                     } else {
                         showExercise();
                     }
                 }
-            },1000);
+            }, 1000);
         }
 
-        function completeWarmup(){
-            const day = currentState.day.day;
-            const exIndex = currentState.exerciseIndex;
-            completedExercises[day] = completedExercises[day] || {};
-            completedExercises[day][exIndex] = true;
-            alert('🔥 Warmup completed!');
-            showExercises();
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
         }
 
+        // Initialize the app
         showHome();
-        document.addEventListener('touchstart',function(e){
-            if(e.touches.length > 1) e.preventDefault();
-        },{passive:false});
+        
+        // Prevent zooming on mobile devices
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) e.preventDefault();
+        }, {passive: false});
     </script>
 </body>
 </html>
