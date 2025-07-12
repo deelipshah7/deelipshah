@@ -1,0 +1,22 @@
+{
+  "name": "Daily Shopping",
+  "short_name": "Shopping",
+  "description": "A daily shopping list organizer",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f2eee3",
+  "theme_color": "#1b4b28",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-196.png",
+      "type": "image/png",
+      "sizes": "196x196"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
