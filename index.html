@@ -3,227 +3,297 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Daily Shopping">
     <title>Daily Shopping</title>
     <style>
         :root {
-            --primary: #4a6fa5;
-            --secondary: #166088;
-            --accent: #4fc3f7;
-            --background: #f5f5f5;
-            --card: #ffffff;
-            --text: #333333;
-            --done: #81c784;
-            --delete: #e57373;
-            --day-button: #e0e0e0;
-            --day-button-active: #4a6fa5;
+            --primary: #007AFF;
+            --secondary: #34C759;
+            --background: #F2F2F7;
+            --card: #FFFFFF;
+            --text: #1C1C1E;
+            --subtext: #8E8E93;
+            --done: #34C759;
+            --delete: #FF3B30;
+            --day-button: #E5E5EA;
+            --day-button-active: #007AFF;
+            --header-height: 44px;
+            --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
             background-color: var(--background);
             color: var(--text);
-            padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
+            padding: 0;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        h1 {
+        .app-header {
+            padding: calc(var(--header-height) / 2) 16px;
+            background-color: var(--card);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
             text-align: center;
-            color: var(--primary);
-            margin-bottom: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .app-header h1 {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: var(--safe-area-inset-bottom);
+        }
+
+        .add-item-container {
+            padding: 16px;
+            background-color: var(--card);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 5;
         }
 
         .add-item {
             display: flex;
-            margin-bottom: 20px;
-            gap: 10px;
+            gap: 8px;
         }
 
         .add-item input {
             flex: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            padding: 10px 12px;
+            border: 1px solid #D1D1D6;
+            border-radius: 10px;
             font-size: 16px;
+            background-color: var(--card);
+            -webkit-appearance: none;
         }
 
         .add-item select {
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            padding: 10px 12px;
+            border: 1px solid #D1D1D6;
+            border-radius: 10px;
             font-size: 16px;
-            background-color: white;
+            background-color: var(--card);
+            -webkit-appearance: none;
+            width: 100px;
         }
 
         .add-item button {
-            padding: 12px 16px;
+            padding: 10px 16px;
             background-color: var(--primary);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .days-container {
+            padding: 8px 16px;
         }
 
         .day-section {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            background-color: var(--card);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .day-header {
-            padding: 15px;
-            background-color: var(--day-button);
-            border-radius: 8px;
-            font-size: 16px;
-            text-align: center;
+            padding: 14px 16px;
+            font-size: 17px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            user-select: none;
         }
 
         .day-header.active {
             background-color: var(--day-button-active);
             color: white;
-            font-weight: bold;
         }
 
-        .day-header .arrow {
-            transition: transform 0.3s;
+        .day-count {
+            font-size: 15px;
+            color: var(--subtext);
+            background-color: rgba(0,0,0,0.1);
+            padding: 2px 8px;
+            border-radius: 10px;
         }
 
-        .day-header.active .arrow {
-            transform: rotate(180deg);
+        .day-header.active .day-count {
+            color: white;
+            background-color: rgba(255,255,255,0.2);
         }
 
         .day-items {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease-out;
-            background-color: var(--card);
-            border-radius: 0 0 8px 8px;
         }
 
         .day-items.expanded {
-            max-height: 2000px; /* Large enough to accommodate all items */
+            max-height: 1000px;
             transition: max-height 0.5s ease-in;
         }
 
         .shopping-list {
             list-style: none;
-            padding: 0 10px 10px 10px;
+            padding: 0 16px 8px 16px;
         }
 
         .shopping-item {
             display: flex;
             align-items: center;
-            padding: 15px;
-            margin-top: 10px;
-            background-color: var(--card);
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: all 0.3s;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .shopping-item:last-child {
+            border-bottom: none;
         }
 
         .shopping-item.done {
-            opacity: 0.7;
-            background-color: #f0f0f0;
+            opacity: 0.6;
         }
 
-        .shopping-item .item-text {
+        .item-text {
             flex: 1;
-            margin-left: 10px;
+            margin-left: 12px;
+            font-size: 16px;
         }
 
         .shopping-item.done .item-text {
             text-decoration: line-through;
-            color: #777;
+            color: var(--subtext);
         }
 
-        .shopping-item .actions {
+        .actions {
             display: flex;
             gap: 8px;
         }
 
-        .shopping-item button {
-            width: 36px;
-            height: 36px;
+        .action-btn {
+            width: 32px;
+            height: 32px;
             border: none;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.2s;
         }
 
-        .shopping-item button.done-btn {
+        .done-btn {
             background-color: var(--done);
             color: white;
         }
 
-        .shopping-item button.delete-btn {
+        .delete-btn {
             background-color: var(--delete);
             color: white;
         }
 
         .empty-state {
             text-align: center;
-            padding: 20px;
-            color: #777;
-            font-style: italic;
+            padding: 16px;
+            color: var(--subtext);
+            font-size: 15px;
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 380px) {
             .add-item {
-                flex-direction: column;
+                flex-wrap: wrap;
+            }
+            
+            .add-item select {
+                width: 100%;
+            }
+            
+            .add-item button {
+                width: 100%;
             }
         }
     </style>
 </head>
 <body>
-    <h1>Daily Shopping</h1>
+    <header class="app-header">
+        <h1>Daily Shopping</h1>
+    </header>
     
-    <div class="add-item">
-        <input type="text" id="itemInput" placeholder="Add an item...">
-        <select id="daySelect">
-            <option value="Monday">Monday</option>
-            <option value="Tuesday">Tuesday</option>
-            <option value="Wednesday">Wednesday</option>
-            <option value="Thursday">Thursday</option>
-            <option value="Friday">Friday</option>
-            <option value="Saturday">Saturday</option>
-            <option value="Sunday">Sunday</option>
-        </select>
-        <button id="addButton">Add</button>
+    <div class="add-item-container">
+        <div class="add-item">
+            <input type="text" id="itemInput" placeholder="Add item..." autocapitalize="sentences">
+            <select id="daySelect">
+                <option value="Monday">Mon</option>
+                <option value="Tuesday">Tue</option>
+                <option value="Wednesday">Wed</option>
+                <option value="Thursday">Thu</option>
+                <option value="Friday">Fri</option>
+                <option value="Saturday">Sat</option>
+                <option value="Sunday">Sun</option>
+            </select>
+            <button id="addButton">Add</button>
+        </div>
     </div>
     
-    <div id="daysContainer">
-        <!-- Day sections will be generated by JavaScript -->
+    <div class="content" id="content">
+        <div class="days-container" id="daysContainer">
+            <!-- Day sections will be generated here -->
+        </div>
     </div>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Days of the week
-            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-            let currentDay = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+            // Days of the week (short and long names)
+            const days = [
+                { short: 'Mon', long: 'Monday' },
+                { short: 'Tue', long: 'Tuesday' },
+                { short: 'Wed', long: 'Wednesday' },
+                { short: 'Thu', long: 'Thursday' },
+                { short: 'Fri', long: 'Friday' },
+                { short: 'Sat', long: 'Saturday' },
+                { short: 'Sun', long: 'Sunday' }
+            ];
+            
+            // Get current day
+            const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
             let shoppingItems = JSON.parse(localStorage.getItem('shoppingItems')) || {};
             
             // Initialize empty arrays for each day if they don't exist
             days.forEach(day => {
-                if (!shoppingItems[day]) {
-                    shoppingItems[day] = [];
+                if (!shoppingItems[day.long]) {
+                    shoppingItems[day.long] = [];
                 }
             });
             
             // Set the default day in the dropdown to today
-            document.getElementById('daySelect').value = currentDay;
+            document.getElementById('daySelect').value = today;
             
             // Create day sections
             const daysContainer = document.getElementById('daysContainer');
@@ -231,14 +301,14 @@
                 const daySection = document.createElement('div');
                 daySection.className = 'day-section';
                 daySection.innerHTML = `
-                    <div class="day-header" data-day="${day}">
-                        <span>${day}</span>
-                        <span class="arrow">▼</span>
+                    <div class="day-header" data-day="${day.long}">
+                        <span>${day.long}</span>
+                        <span class="day-count">${shoppingItems[day.long].length}</span>
                     </div>
                     <div class="day-items">
-                        <ul class="shopping-list" data-day="${day}">
-                            ${shoppingItems[day].length === 0 ? 
-                                '<div class="empty-state">No items for ' + day + '</div>' : 
+                        <ul class="shopping-list" data-day="${day.long}">
+                            ${shoppingItems[day.long].length === 0 ? 
+                                '<div class="empty-state">No items for ' + day.long + '</div>' : 
                                 ''}
                         </ul>
                     </div>
@@ -246,7 +316,7 @@
                 daysContainer.appendChild(daySection);
                 
                 // Set today as expanded by default
-                if (day === currentDay) {
+                if (day.long === today) {
                     const header = daySection.querySelector('.day-header');
                     const items = daySection.querySelector('.day-items');
                     header.classList.add('active');
@@ -312,19 +382,25 @@
                         // Expand our day
                         header.classList.add('active');
                         items.classList.add('expanded');
+                        
+                        // Scroll to the day section
+                        header.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     }
                 }
             }
             
             function renderItems() {
                 days.forEach(day => {
-                    const list = document.querySelector(`.shopping-list[data-day="${day}"]`);
-                    list.innerHTML = '';
+                    const list = document.querySelector(`.shopping-list[data-day="${day.long}"]`);
+                    const countBadge = document.querySelector(`.day-header[data-day="${day.long}"] .day-count`);
                     
-                    const items = shoppingItems[day];
+                    list.innerHTML = '';
+                    countBadge.textContent = shoppingItems[day.long].length;
+                    
+                    const items = shoppingItems[day.long];
                     
                     if (items.length === 0) {
-                        list.innerHTML = '<div class="empty-state">No items for ' + day + '</div>';
+                        list.innerHTML = '<div class="empty-state">No items for ' + day.long + '</div>';
                         return;
                     }
                     
@@ -336,8 +412,8 @@
                         li.innerHTML = `
                             <span class="item-text">${item.text}</span>
                             <div class="actions">
-                                <button class="done-btn" data-day="${day}" data-index="${index}">✓</button>
-                                <button class="delete-btn" data-day="${day}" data-index="${index}">✕</button>
+                                <button class="action-btn done-btn" data-day="${day.long}" data-index="${index}">✓</button>
+                                <button class="action-btn delete-btn" data-day="${day.long}" data-index="${index}">✕</button>
                             </div>
                         `;
                         
@@ -373,6 +449,18 @@
             
             // Initial render
             renderItems();
+            
+            // Prevent bounce scroll on iOS
+            document.body.addEventListener('touchmove', function(e) {
+                if (document.querySelector('.content').scrollTop === 0) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            // Make the app feel more native when added to home screen
+            if (window.navigator.standalone) {
+                document.documentElement.style.setProperty('--header-height', '44px');
+            }
         });
     </script>
 </body>
