@@ -6,21 +6,27 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Daily Shopping">
+    
+    <!-- App Icons -->
+    <link rel="apple-touch-icon" sizes="196x196" href="icon-196.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    <link rel="manifest" href="manifest.webmanifest">
+    
     <title>Daily Shopping</title>
     <style>
         :root {
-            --primary: #5E35B1;
-            --secondary: #3949AB;
-            --accent: #7C4DFF;
-            --background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            --primary: #1b4b28;      /* Dark green */
+            --secondary: #e87220;    /* Orange */
+            --accent: #e87220;      /* Orange */
+            --background: #f2eee3;   /* Cream */
             --card: #FFFFFF;
-            --text: #2D3748;
-            --subtext: #718096;
-            --done: #48BB78;
-            --delete: #F56565;
+            --text: #333333;
+            --subtext: #666666;
+            --done: #4CAF50;
+            --delete: #F44336;
             --day-button: #EDF2F7;
-            --day-button-active: #5E35B1;
-            --header-bg: linear-gradient(135deg, #6B46C1 0%, #5E35B1 100%);
+            --day-button-active: #1b4b28;
+            --header-bg: #1b4b28;
             --header-height: 60px;
             --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
         }
@@ -132,12 +138,12 @@
             cursor: pointer;
             white-space: nowrap;
             transition: all 0.2s;
-            box-shadow: 0 2px 5px rgba(92, 53, 177, 0.3);
+            box-shadow: 0 2px 5px rgba(232, 114, 32, 0.3);
         }
 
         .add-item button:active {
             transform: translateY(1px);
-            box-shadow: 0 1px 3px rgba(92, 53, 177, 0.3);
+            box-shadow: 0 1px 3px rgba(232, 114, 32, 0.3);
         }
 
         .days-container {
@@ -170,7 +176,7 @@
         }
 
         .day-header.active {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            background: var(--primary);
             color: white;
         }
 
@@ -316,6 +322,20 @@
     </div>
     
     <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+
+        // Main App Code
         document.addEventListener('DOMContentLoaded', function() {
             // Days of the week (short and long names)
             const days = [
