@@ -3,241 +3,377 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#4CAF50">
-    <title>Workout Planner</title>
+    <title>Daily Shopping</title>
     <style>
-        *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;margin:0;padding:0;background-color:#f5f5f5;font-size:16px}.container{max-width:100%;min-height:100vh;padding:0;position:relative}.header{background-color:#4CAF50;color:#fff;padding:1rem;position:sticky;top:0;z-index:10;box-shadow:0 2px 4px rgba(0,0,0,.1)}.content{padding:1rem;padding-bottom:60px}.btn{display:block;width:calc(100% - 2rem);background-color:#4CAF50;color:#fff;padding:15px 20px;border:none;border-radius:8px;font-size:1.1rem;margin:0.5rem 1rem;cursor:pointer;transition:transform .1s;touch-action:manipulation}.btn:active{transform:scale(.98);background-color:#45a049}.list{list-style:none;padding:0;margin:0}.list-item{padding:1rem;margin:0.5rem 0;background:#fff;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.05);cursor:pointer;transition:transform .1s;min-height:60px;display:flex;align-items:center;justify-content:space-between}.list-item:active{transform:scale(.98)}.timer{font-size:2.5rem;text-align:center;padding:2rem;color:#333;font-weight:700}.progress-circle{width:100px;height:100px;margin:1rem auto;position:relative}.progress-circle svg{transform:rotate(-90deg)}.progress-circle circle{fill:none;stroke-width:8;stroke-linecap:round}.progress-circle-back{stroke:#eee}.progress-circle-front{stroke:#4CAF50;transition:stroke-dashoffset 1s linear}.back-btn{position:fixed;bottom:1rem;left:1rem;right:1rem;background-color:#e0e0e0;color:#333}.completed{background-color:#e8f5e9!important;color:#2e7d32!important}.set-buttons{display:grid;grid-template-columns:repeat(2,1fr);gap:0.5rem;margin:1rem 0}.set-btn{width:100%;padding:1rem;border-radius:8px;background:#f5f5f5;border:2px solid #ddd;color:#333}.set-btn.active{background:#4CAF50;color:#fff;border-color:#45a049}.checkmark{color:#2e7d32;font-weight:bold;margin-left:10px}
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #166088;
+            --accent: #4fc3f7;
+            --background: #f5f5f5;
+            --card: #ffffff;
+            --text: #333333;
+            --done: #81c784;
+            --delete: #e57373;
+            --day-button: #e0e0e0;
+            --day-button-active: #4a6fa5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .add-item {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .add-item input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .add-item select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: white;
+        }
+
+        .add-item button {
+            padding: 12px 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .day-section {
+            margin-bottom: 10px;
+        }
+
+        .day-header {
+            padding: 15px;
+            background-color: var(--day-button);
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .day-header.active {
+            background-color: var(--day-button-active);
+            color: white;
+            font-weight: bold;
+        }
+
+        .day-header .arrow {
+            transition: transform 0.3s;
+        }
+
+        .day-header.active .arrow {
+            transform: rotate(180deg);
+        }
+
+        .day-items {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background-color: var(--card);
+            border-radius: 0 0 8px 8px;
+        }
+
+        .day-items.expanded {
+            max-height: 2000px; /* Large enough to accommodate all items */
+            transition: max-height 0.5s ease-in;
+        }
+
+        .shopping-list {
+            list-style: none;
+            padding: 0 10px 10px 10px;
+        }
+
+        .shopping-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-top: 10px;
+            background-color: var(--card);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .shopping-item.done {
+            opacity: 0.7;
+            background-color: #f0f0f0;
+        }
+
+        .shopping-item .item-text {
+            flex: 1;
+            margin-left: 10px;
+        }
+
+        .shopping-item.done .item-text {
+            text-decoration: line-through;
+            color: #777;
+        }
+
+        .shopping-item .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .shopping-item button {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .shopping-item button.done-btn {
+            background-color: var(--done);
+            color: white;
+        }
+
+        .shopping-item button.delete-btn {
+            background-color: var(--delete);
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-style: italic;
+        }
+
+        @media (max-width: 480px) {
+            .add-item {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1 style="margin:0;font-size:1.5rem" id="headerTitle">Workout Planner</h1>
-        </div>
-        <div class="content" id="screen"></div>
+    <h1>Daily Shopping</h1>
+    
+    <div class="add-item">
+        <input type="text" id="itemInput" placeholder="Add an item...">
+        <select id="daySelect">
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+            <option value="Saturday">Saturday</option>
+            <option value="Sunday">Sunday</option>
+        </select>
+        <button id="addButton">Add</button>
     </div>
-
+    
+    <div id="daysContainer">
+        <!-- Day sections will be generated by JavaScript -->
+    </div>
+    
     <script>
-        const workoutPlan = [
-            {
-                day: 1,
-                name: "Push (Chest, Shoulders, Triceps)",
-                exercises: [
-                    {name: "Flat Barbell Bench Press – 4x6-8 (Middle/Lower Chest)", sets: 4, rest: 180},
-                    {name: "Overhead Barbell Press – 4x6-8 (Front/Side Delts)", sets: 4, rest: 120},
-                    {name: "Incline Dumbbell Press – 3x8-10 (Upper Chest)", sets: 3, rest: 90},
-                    {name: "Lateral Raises – 3x12-15 (Side Delts)", sets: 3, rest: 120},
-                    {name: "+Barbell Back Squats – 4x6-8 (Quads/Glutes)", sets: 4, rest: 120},
-                    {name: "Weighted Dips – 3x8-10 (Lower Chest/Triceps)", sets: 3, rest: 90},
-                    {name: "+Bulgarian Split Squats – 3x8-10/leg (Quads/Glutes)", sets: 3, rest: 90},
-                    {name: "Overhead Triceps Extension – 3x8-10 (Long Head Triceps)", sets: 3, rest: 60},
-                    {name: "+Leg Extensions – 3x12-15 (Quads)", sets: 3, rest: 60},
-                    {name: "Cable Fly (Low to High) – 3x12-15 (Upper Chest)", sets: 3, rest: 45}
-                ]
-            },
-            {
-                day: 2,
-                name: "Pull (Back, Traps, Biceps)",
-                exercises: [
-                    {name: "Deadlifts – 4x5-6 (Posterior Chain)", sets: 4, rest: 180},
-                    {name: "Pull-Ups – 3x6-8 (Lats/Upper Back)", sets: 3, rest: 120},
-                    {name: "Bent-Over Rows – 4x6-8 (Mid-Back/Lats)", sets: 4, rest: 120},
-                    {name: "Seated Cable Rows – 3x8-10 (Lats/Mid-Back)", sets: 3, rest: 60},
-                    {name: "+Hanging Leg Raises – 3x12-15 (Lower Abs)", sets: 3, rest: 60},
-                    {name: "Face Pulls – 3x12-15 (Rear Delts/Upper Back)", sets: 3, rest: 60},
-                    {name: "+Cable Woodchoppers – 3x10-12/side (Obliques)", sets: 3, rest: 60},
-                    {name: "Shrugs – 3x12-15 (Traps)", sets: 3, rest: 60},
-                    {name: "+Weighted Plank – 3x45sec (Core)", sets: 3, rest: 60},
-                    {name: "Barbell Curls – 3x8-10 (Biceps)", sets: 3, rest: 60}
-                ]
-            },
-            {
-                day: 3,
-                name: "Legs + Core",
-                exercises: [
-                    {name: "Front Squats – 4x6-8 (Quads/Core)", sets: 4, rest: 180},
-                    {name: "Romanian Deadlifts – 3x8-10 (Hamstrings/Glutes)", sets: 3, rest: 120},
-                    {name: "Leg Press – 3x8-10 (Quads/Glutes)", sets: 3, rest: 90},
-                    {name: "Hamstring Curls – 3x12-15", sets: 3, rest: 60},
-                    {name: "Ab Wheel Rollouts – 3x10-12 (Full Abs)", sets: 3, rest: 60},
-                    {name: "Standing Calf Raises – 4x12-15", sets: 4, rest: 45},
-                    {name: "Russian Twists – 3x12/side (Obliques)", sets: 3, rest: 45}
-                ]
-            },
-            {
-                day: 4,
-                name: "Push (Chest, Shoulders, Triceps)",
-                exercises: [
-                    {name: "Incline Barbell Press – 4x6-8 (Upper Chest)", sets: 4, rest: 180},
-                    {name: "Arnold Press – 3x8-10 (Front/Side Delts)", sets: 3, rest: 90},
-                    {name: "Decline Dumbbell Press – 3x8-10 (Lower Chest)", sets: 3, rest: 90},
-                    {name: "Triceps Rope Pushdown – 3x12-15 (Lateral/Medial Triceps)", sets: 3, rest: 60},
-                    {name: "Skull Crushers – 3x8-10 (All Triceps Heads)", sets: 3, rest: 90},
-                    {name: "+Walking Lunges – 3x12 steps/leg (Quads/Glutes)", sets: 3, rest: 90},
-                    {name: "Pec-Deck Fly – 3x12-15 (Chest)", sets: 3, rest: 60},
-                    {name: "+Seated Calf Raises – 4x12-15 (Calves)", sets: 4, rest: 60}
-                ]
-            },
-            {
-                day: 5,
-                name: "Pull (Back, Traps, Biceps)",
-                exercises: [
-                    {name: "Lat Pulldown – 4x8-10 (Lats)", sets: 4, rest: 120},
-                    {name: "T-Bar Rows – 4x6-8 (Mid-Back)", sets: 4, rest: 120},
-                    {name: "Single-Arm Dumbbell Rows – 3x8-10/side (Lats/Mid-Back)", sets: 3, rest: 90},
-                    {name: "Reverse Pec Deck – 3x12-15 (Rear Delts)", sets: 3, rest: 60},
-                    {name: "Hammer Curls – 3x8-10 (Brachialis)", sets: 3, rest: 60},
-                    {name: "+Hanging Leg Raises – 3x12-15 (Lower Abs)", sets: 3, rest: 60},
-                    {name: "Wrist Curls – 3x15-20 (Forearms)", sets: 3, rest: 45},
-                    {name: "+Weighted Sit-Ups – 3x12-15 (Upper Abs)", sets: 3, rest: 45}
-                ]
-            }
-        ];
-
-        let currentState = {day: null, exercise: null, currentSet: 1, exerciseIndex: null};
-        let timerInterval = null;
-        let completedExercises = JSON.parse(localStorage.getItem('workoutProgress')) || {};
-
-        function render(content) {
-            document.getElementById('screen').innerHTML = content;
-        }
-
-        function updateHeader(title) {
-            document.getElementById('headerTitle').textContent = title;
-        }
-
-        function saveProgress() {
-            localStorage.setItem('workoutProgress', JSON.stringify(completedExercises));
-        }
-
-        function showHome() {
-            updateHeader('Workout Planner');
-            render(`
-                <button class="btn" onclick="showDays()">Start Workout</button>
-                <button class="btn" onclick="resetProgress()" style="background-color:#f44336">Reset Progress</button>
-            `);
-        }
-
-        function resetProgress() {
-            if (confirm("Are you sure you want to reset all your workout progress?")) {
-                completedExercises = {};
-                saveProgress();
-                showHome();
-            }
-        }
-
-        function showDays() {
-            updateHeader('Select Workout Day');
-            const days = workoutPlan.map(day => `
-                <li class="list-item" onclick="selectDay(${day.day - 1})">
-                    <div>
-                        <strong>Day ${day.day}: ${day.name}</strong>
-                        ${completedExercises[day.day]?.all ? '<div style="font-size:0.8em;color:#2e7d32">Completed</div>' : ''}
+        document.addEventListener('DOMContentLoaded', function() {
+            // Days of the week
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            let currentDay = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+            let shoppingItems = JSON.parse(localStorage.getItem('shoppingItems')) || {};
+            
+            // Initialize empty arrays for each day if they don't exist
+            days.forEach(day => {
+                if (!shoppingItems[day]) {
+                    shoppingItems[day] = [];
+                }
+            });
+            
+            // Set the default day in the dropdown to today
+            document.getElementById('daySelect').value = currentDay;
+            
+            // Create day sections
+            const daysContainer = document.getElementById('daysContainer');
+            days.forEach(day => {
+                const daySection = document.createElement('div');
+                daySection.className = 'day-section';
+                daySection.innerHTML = `
+                    <div class="day-header" data-day="${day}">
+                        <span>${day}</span>
+                        <span class="arrow">▼</span>
                     </div>
-                    ${completedExercises[day.day]?.all ? '<span class="checkmark">✓</span>' : ''}
-                </li>
-            `).join('');
-            render(`<ul class="list">${days}</ul><button class="btn back-btn" onclick="showHome()">Back</button>`);
-        }
-
-        function selectDay(dayIndex) {
-            currentState.day = workoutPlan[dayIndex];
-            showExercises();
-        }
-
-        function showExercises() {
-            updateHeader(`Day ${currentState.day.day}: ${currentState.day.name}`);
-            const exercises = currentState.day.exercises.map((ex, i) => `
-                <li class="list-item ${completedExercises[currentState.day.day]?.[i] ? 'completed' : ''}" onclick="selectExercise(${i})">
-                    <span>${i + 1}. ${ex.name} (${ex.sets}x, ${ex.rest}s rest)</span>
-                    ${completedExercises[currentState.day.day]?.[i] ? '<span class="checkmark">✓</span>' : ''}
-                </li>
-            `).join('');
-            render(`<ul class="list">${exercises}</ul><button class="btn back-btn" onclick="showDays()">Back</button>`);
-        }
-
-        function selectExercise(exIndex) {
-            currentState.exercise = currentState.day.exercises[exIndex];
-            currentState.exerciseIndex = exIndex;
-            currentState.currentSet = 1;
-            showExercise();
-        }
-
-        function showExercise() {
-            updateHeader(currentState.exercise.name);
-            const sets = Array(currentState.exercise.sets).fill().map((_, i) => `
-                <button class="set-btn ${i < currentState.currentSet - 1 ? 'completed' : ''} ${i === currentState.currentSet - 1 ? 'active' : 'disabled'}" 
-                    ${i === currentState.currentSet - 1 ? 'onclick="startSet()"' : ''}>
-                    Set ${i + 1}
-                    ${i < currentState.currentSet - 1 ? '<span class="checkmark">✓</span>' : ''}
-                </button>
-            `).join('');
-            render(`
-                <div class="set-buttons">${sets}</div>
-                <div id="timerContainer"></div>
-                <button class="btn back-btn" onclick="showExercises()">Back</button>
-            `);
-        }
-
-        function startSet() {
-            clearInterval(timerInterval);
-            const restTime = currentState.exercise.rest;
-            let timeLeft = restTime;
-            
-            document.getElementById('timerContainer').innerHTML = `
-                <div class="timer">${formatTime(timeLeft)}</div>
-                <div class="progress-circle">
-                    <svg viewBox="0 0 100 100">
-                        <circle class="progress-circle-back" cx="50" cy="50" r="45"/>
-                        <circle class="progress-circle-front" cx="50" cy="50" r="45"
-                            stroke-dasharray="283" stroke-dashoffset="${283 * (1 - timeLeft / restTime)}"/>
-                    </svg>
-                </div>`;
-            
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                document.querySelector('.timer').textContent = formatTime(timeLeft);
-                document.querySelector('.progress-circle-front').style.strokeDashoffset = 283 * (1 - timeLeft / restTime);
+                    <div class="day-items">
+                        <ul class="shopping-list" data-day="${day}">
+                            ${shoppingItems[day].length === 0 ? 
+                                '<div class="empty-state">No items for ' + day + '</div>' : 
+                                ''}
+                        </ul>
+                    </div>
+                `;
+                daysContainer.appendChild(daySection);
                 
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    currentState.currentSet++;
+                // Set today as expanded by default
+                if (day === currentDay) {
+                    const header = daySection.querySelector('.day-header');
+                    const items = daySection.querySelector('.day-items');
+                    header.classList.add('active');
+                    items.classList.add('expanded');
+                }
+            });
+            
+            // Day header click handlers
+            document.querySelectorAll('.day-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const items = this.nextElementSibling;
+                    const wasExpanded = items.classList.contains('expanded');
                     
-                    if (currentState.currentSet > currentState.exercise.sets) {
-                        const day = currentState.day.day;
-                        const exIndex = currentState.exerciseIndex;
-                        completedExercises[day] = completedExercises[day] || {};
-                        completedExercises[day][exIndex] = true;
-                        
-                        // Check if all exercises are completed for this day
-                        const allExercisesDone = currentState.day.exercises.every((_, i) => completedExercises[day]?.[i]);
-                        if (allExercisesDone) {
-                            completedExercises[day].all = true;
-                        }
-                        
-                        saveProgress();
-                        showExercises();
-                    } else {
-                        showExercise();
+                    // Collapse all day items
+                    document.querySelectorAll('.day-items').forEach(el => {
+                        el.classList.remove('expanded');
+                    });
+                    document.querySelectorAll('.day-header').forEach(el => {
+                        el.classList.remove('active');
+                    });
+                    
+                    // Toggle the clicked day
+                    if (!wasExpanded) {
+                        this.classList.add('active');
+                        items.classList.add('expanded');
+                    }
+                });
+            });
+            
+            // Add item functionality
+            document.getElementById('addButton').addEventListener('click', addItem);
+            document.getElementById('itemInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') addItem();
+            });
+            
+            function addItem() {
+                const input = document.getElementById('itemInput');
+                const daySelect = document.getElementById('daySelect');
+                const itemText = input.value.trim();
+                const day = daySelect.value;
+                
+                if (itemText) {
+                    shoppingItems[day].push({
+                        text: itemText,
+                        done: false
+                    });
+                    
+                    saveItems();
+                    input.value = '';
+                    renderItems();
+                    
+                    // Expand the day we just added to if it's collapsed
+                    const header = document.querySelector(`.day-header[data-day="${day}"]`);
+                    const items = header.nextElementSibling;
+                    if (!items.classList.contains('expanded')) {
+                        // Collapse all first
+                        document.querySelectorAll('.day-items').forEach(el => {
+                            el.classList.remove('expanded');
+                        });
+                        document.querySelectorAll('.day-header').forEach(el => {
+                            el.classList.remove('active');
+                        });
+                        // Expand our day
+                        header.classList.add('active');
+                        items.classList.add('expanded');
                     }
                 }
-            }, 1000);
-        }
-
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-        }
-
-        // Initialize the app
-        showHome();
-        
-        // Prevent zooming on mobile devices
-        document.addEventListener('touchstart', function(e) {
-            if (e.touches.length > 1) e.preventDefault();
-        }, {passive: false});
+            }
+            
+            function renderItems() {
+                days.forEach(day => {
+                    const list = document.querySelector(`.shopping-list[data-day="${day}"]`);
+                    list.innerHTML = '';
+                    
+                    const items = shoppingItems[day];
+                    
+                    if (items.length === 0) {
+                        list.innerHTML = '<div class="empty-state">No items for ' + day + '</div>';
+                        return;
+                    }
+                    
+                    items.forEach((item, index) => {
+                        const li = document.createElement('li');
+                        li.className = 'shopping-item';
+                        if (item.done) li.classList.add('done');
+                        
+                        li.innerHTML = `
+                            <span class="item-text">${item.text}</span>
+                            <div class="actions">
+                                <button class="done-btn" data-day="${day}" data-index="${index}">✓</button>
+                                <button class="delete-btn" data-day="${day}" data-index="${index}">✕</button>
+                            </div>
+                        `;
+                        
+                        list.appendChild(li);
+                    });
+                });
+                
+                // Add event listeners to the new buttons
+                document.querySelectorAll('.done-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const day = this.getAttribute('data-day');
+                        const index = parseInt(this.getAttribute('data-index'));
+                        shoppingItems[day][index].done = !shoppingItems[day][index].done;
+                        saveItems();
+                        renderItems();
+                    });
+                });
+                
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const day = this.getAttribute('data-day');
+                        const index = parseInt(this.getAttribute('data-index'));
+                        shoppingItems[day].splice(index, 1);
+                        saveItems();
+                        renderItems();
+                    });
+                });
+            }
+            
+            function saveItems() {
+                localStorage.setItem('shoppingItems', JSON.stringify(shoppingItems));
+            }
+            
+            // Initial render
+            renderItems();
+        });
     </script>
 </body>
 </html>
