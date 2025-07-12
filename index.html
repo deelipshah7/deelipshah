@@ -9,19 +9,21 @@
     <title>Daily Shopping</title>
     <style>
         :root {
-    --primary: #1E88E5;  /* Nice blue */
-    --secondary: #0D47A1; /* Darker blue */
-    --accent: #42A5F5;   /* Lighter blue */
-    --background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%); /* Very light blue gradient */
-    --card: #FFFFFF;
-    --text: #0A2463;     /* Dark blue for text */
-    --subtext: #546E7A;  /* Blue-gray for subtext */
-    --done: #4CAF50;     /* Keeping green for done items */
-    --delete: #EF5350;   /* Keeping red for delete */
-    --day-button: #E1F5FE; /* Very light blue */
-    --day-button-active: #0288D1; /* Medium blue */
-    --header-bg: linear-gradient(135deg, #1976D2 0%, #0D47A1 100%); /* Blue gradient */
-}
+            --primary: #5E35B1;
+            --secondary: #3949AB;
+            --accent: #7C4DFF;
+            --background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            --card: #FFFFFF;
+            --text: #2D3748;
+            --subtext: #718096;
+            --done: #48BB78;
+            --delete: #F56565;
+            --day-button: #EDF2F7;
+            --day-button-active: #5E35B1;
+            --header-bg: linear-gradient(135deg, #6B46C1 0%, #5E35B1 100%);
+            --header-height: 60px;
+            --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+        }
 
         * {
             box-sizing: border-box;
@@ -32,7 +34,7 @@
         }
 
         body {
-            background-color: var(--background);
+            background: var(--background);
             color: var(--text);
             padding: 0;
             margin: 0;
@@ -43,18 +45,22 @@
         }
 
         .app-header {
-            padding: calc(var(--header-height) / 2) 16px;
-            background-color: var(--card);
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-            text-align: center;
+            padding: 0 16px;
+            background: var(--header-bg);
+            color: white;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             position: relative;
             z-index: 10;
         }
 
         .app-header h1 {
-            font-size: 17px;
+            font-size: 20px;
             font-weight: 600;
-            color: var(--text);
+            letter-spacing: 0.5px;
         }
 
         .content {
@@ -67,10 +73,11 @@
         .add-item-container {
             padding: 16px;
             background-color: var(--card);
-            border-bottom: 1px solid rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
             position: sticky;
             top: 0;
             z-index: 5;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
         .add-item {
@@ -80,70 +87,102 @@
 
         .add-item input {
             flex: 1;
-            padding: 10px 12px;
-            border: 1px solid #D1D1D6;
-            border-radius: 10px;
+            padding: 12px 16px;
+            border: 2px solid #E2E8F0;
+            border-radius: 12px;
             font-size: 16px;
             background-color: var(--card);
             -webkit-appearance: none;
+            transition: all 0.2s;
+        }
+
+        .add-item input:focus {
+            border-color: var(--accent);
+            outline: none;
         }
 
         .add-item select {
-            padding: 10px 12px;
-            border: 1px solid #D1D1D6;
-            border-radius: 10px;
+            padding: 12px 16px;
+            border: 2px solid #E2E8F0;
+            border-radius: 12px;
             font-size: 16px;
             background-color: var(--card);
             -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
             width: 100px;
+            transition: all 0.2s;
+        }
+
+        .add-item select:focus {
+            border-color: var(--accent);
+            outline: none;
         }
 
         .add-item button {
-            padding: 10px 16px;
-            background-color: var(--primary);
+            padding: 12px 20px;
+            background: var(--accent);
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             white-space: nowrap;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(92, 53, 177, 0.3);
+        }
+
+        .add-item button:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 3px rgba(92, 53, 177, 0.3);
         }
 
         .days-container {
-            padding: 8px 16px;
+            padding: 12px 16px;
         }
 
         .day-section {
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             background-color: var(--card);
-            border-radius: 10px;
+            border-radius: 14px;
             overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+
+        .day-section:active {
+            transform: translateY(1px);
         }
 
         .day-header {
-            padding: 14px 16px;
-            font-size: 17px;
-            font-weight: 500;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 600;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
             user-select: none;
+            transition: all 0.2s;
         }
 
         .day-header.active {
-            background-color: var(--day-button-active);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
         }
 
         .day-count {
             font-size: 15px;
+            font-weight: 500;
             color: var(--subtext);
-            background-color: rgba(0,0,0,0.1);
-            padding: 2px 8px;
+            background-color: rgba(0,0,0,0.05);
+            padding: 4px 10px;
             border-radius: 10px;
+            min-width: 28px;
+            text-align: center;
         }
 
         .day-header.active .day-count {
@@ -164,14 +203,15 @@
 
         .shopping-list {
             list-style: none;
-            padding: 0 16px 8px 16px;
+            padding: 0 16px 12px 16px;
         }
 
         .shopping-item {
             display: flex;
             align-items: center;
-            padding: 12px 0;
+            padding: 14px 0;
             border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.2s;
         }
 
         .shopping-item:last-child {
@@ -179,13 +219,14 @@
         }
 
         .shopping-item.done {
-            opacity: 0.6;
+            opacity: 0.7;
         }
 
         .item-text {
             flex: 1;
-            margin-left: 12px;
-            font-size: 16px;
+            margin-left: 14px;
+            font-size: 17px;
+            font-weight: 500;
         }
 
         .shopping-item.done .item-text {
@@ -195,18 +236,24 @@
 
         .actions {
             display: flex;
-            gap: 8px;
+            gap: 10px;
         }
 
         .action-btn {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border: none;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
         }
 
         .done-btn {
@@ -221,7 +268,7 @@
 
         .empty-state {
             text-align: center;
-            padding: 16px;
+            padding: 20px;
             color: var(--subtext);
             font-size: 15px;
         }
@@ -459,7 +506,7 @@
             
             // Make the app feel more native when added to home screen
             if (window.navigator.standalone) {
-                document.documentElement.style.setProperty('--header-height', '44px');
+                document.documentElement.style.setProperty('--header-height', '60px');
             }
         });
     </script>
